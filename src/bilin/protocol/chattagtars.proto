@@ -1,0 +1,195 @@
+syntax = "proto3";
+import "push.proto";
+option go_package = "bilin";
+package bilin.chattagtars;
+
+message PageInfo{
+    int64 pagenum = 1; // 页码，从1开始
+    int64 pagesize = 2; // 每页条数 默认20，最大不超过500
+}
+
+message ChatTag{
+    int64 id = 1;
+    string TagName = 2;
+    string TagColor = 3;
+}
+
+message CChatTagReq{
+    ChatTag chattag = 1;
+}
+message CChatTagResp{
+}
+
+message RChatTagReq {
+}
+message RChatTagResp {
+    repeated ChatTag chattag = 1;
+}
+
+message UChatTagReq{
+    ChatTag chattag = 1;
+}
+message UChatTagResp{
+}
+
+message DChatTagReq{
+    ChatTag chattag = 1;
+}
+message DChatTagResp{
+}
+
+// PUA聊妹套话CRUD
+message PUATopic{
+    int64 id = 1;
+    string topic = 2;
+}
+message CPUATopicReq{
+    PUATopic info = 1;
+}
+message CPUATopicResp{
+}
+message RPUATopicReq {
+    PageInfo page = 1;
+}
+message RPUATopicResp {
+    repeated PUATopic info = 1;
+    int64 totalpagenum = 2;
+}
+message UPUATopicReq{
+    PUATopic info = 1;
+}
+message UPUATopicResp{
+}
+message DPUATopicReq{
+    PUATopic info = 1;
+}
+message DPUATopicResp{
+}
+
+// 真心话
+message TruthTopic{
+    int64 id = 1;
+    string topic = 2;
+}
+message CTruthTopicReq{
+    TruthTopic info = 1;
+}
+message CTruthTopicResp{
+}
+message RTruthTopicReq {
+    PageInfo page = 1;
+}
+message RTruthTopicResp {
+    repeated TruthTopic info = 1;
+    int64 totalpagenum = 2;
+}
+message UTruthTopicReq{
+    TruthTopic info = 1;
+}
+message UTruthTopicResp{
+}
+message DTruthTopicReq{
+    TruthTopic info = 1;
+}
+message DTruthTopicResp{
+}
+
+// 用户聊天标签
+message UserChatTag{
+    int64 id = 1;
+    int64 fromuserid = 2; // 打标签的用户uid
+    int64 touserid = 3; // 被打标签的用户uid
+    string chattags  = 4; // 标签id信息，多个标签id以,分割
+    int64 updatetimes = 5; // 更新次数
+    int64 talksecond = 6; // 聊天时间
+    int64 tagstatus = 7; // 标签状态
+}
+message CUserChatTagReq{
+    UserChatTag info = 1;
+}
+message CUserChatTagResp{
+}
+message RUserChatTagReq {
+    UserChatTag info = 1;
+}
+message RUserChatTagResp {
+    repeated UserChatTag info = 1;
+}
+
+//message UserChatTagSummary {
+//    int64 touserid = 1;
+//    int64 totaltagnum = 2;
+//    int64 tagid = 3;
+//    string TagName = 4;
+//    string TagColor = 5;
+//}
+
+message TopNUser {
+    int64 touserid = 1;
+    int64 topn = 2;
+}
+//message UserChatTagSummaryS {
+//    repeated UserChatTagSummary summary = 1;
+//}
+
+message RTopNUserChatTagSummaryReq{
+    TopNUser topuser = 1;
+}
+message RTopNUserChatTagSummaryResp{
+    UserChatTagSummaryS summary = 1;
+}
+
+message BatchRTopNUserChatTagSummaryReq{
+    repeated TopNUser topnuser = 1;
+}
+message BatchRTopNUserChatTagSummaryResp{
+    map<int64,UserChatTagSummaryS> summary = 1;
+}
+
+message UUserChatTagReq{
+    UserChatTag info = 1;
+}
+message UUserChatTagResp{
+}
+message DUserChatTagReq{
+    UserChatTag info = 1;
+}
+message DUserChatTagResp{
+}
+
+service ChatTagTars {
+    /*
+    聊天标签CRUD
+    */
+    rpc CChatTag(CChatTagReq) returns(CChatTagResp);
+    rpc RChatTag (RChatTagReq) returns (RChatTagResp);
+    rpc UChatTag(UChatTagReq) returns (UChatTagResp);
+    rpc DChatTag(DChatTagReq) returns(DChatTagResp);
+
+    /*
+    PUA聊妹套话CRUD
+    */
+    rpc CPUATopic(CPUATopicReq) returns(CPUATopicResp);
+    rpc RPUATopic (RPUATopicReq) returns (RPUATopicResp);
+    rpc UPUATopic(UPUATopicReq) returns (UPUATopicResp);
+    rpc DPUATopic(DPUATopicReq) returns(DPUATopicResp);
+
+    /*
+    真心话CRUD
+    */
+    rpc CTruthTopic(CTruthTopicReq) returns(CTruthTopicResp);
+    rpc RTruthTopic (RTruthTopicReq) returns (RTruthTopicResp);
+    rpc UTruthTopic(UTruthTopicReq) returns (UTruthTopicResp);
+    rpc DTruthTopic(DTruthTopicReq) returns(DTruthTopicResp);
+
+    /*
+    用户聊天标签CRUD
+    */
+    rpc CUserChatTag(CUserChatTagReq) returns(CUserChatTagResp);
+    rpc RUserChatTag (RUserChatTagReq) returns (RUserChatTagResp);
+    // 根据标签个数排序的前N个标签信息
+    rpc RTopNUserChatTagSummary (RTopNUserChatTagSummaryReq) returns(RTopNUserChatTagSummaryResp);
+    rpc BatchRTopNUserChatTagSummary (BatchRTopNUserChatTagSummaryReq) returns(BatchRTopNUserChatTagSummaryResp);
+    rpc UUserChatTag(UUserChatTagReq) returns (UUserChatTagResp);
+    rpc DUserChatTag(DUserChatTagReq) returns(DUserChatTagResp);
+}

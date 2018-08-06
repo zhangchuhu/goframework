@@ -1,0 +1,78 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>element table</title>
+    <link rel="stylesheet" href="css/index.css">
+</head>
+<body>
+<div id="app">
+    <el-table
+            :data="tableData"
+            style="width: 100%"
+            :default-sort = "{prop: 'date', order: 'descending'}"
+    >
+        <el-table-column
+                prop="roomid"
+                label="房间ID"
+                sortable
+                width="180">
+        </el-table-column>
+        <el-table-column
+                prop="owner"
+                label="主持人uid"
+                sortable
+                width="180">
+        </el-table-column>
+        <el-table-column
+                prop="title"
+                label="房间标题"
+                width="180"
+                align="center"
+        >
+        </el-table-column>
+        <el-table-column
+                prop="starttime"
+                label="开播时间"
+                sortable
+                width="180"
+                align="center">
+        </el-table-column>
+        <el-table-column
+                prop="endtime"
+                label="关播时间"
+                sortable
+                width="180"
+                align="center">
+        </el-table-column>
+        <el-table-column
+                prop="livingTime"
+                label="直播时长"
+                sortable
+                width="180"
+                align="center">
+        </el-table-column>
+    </el-table>
+</div>
+</body>
+<script src="js/vue.js"></script>
+<script src="js/index.js"></script>
+<script src="https://unpkg.com/element-ui/lib/index.js"></script>
+<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+<script>
+    var baseUrl = 'http://58.215.138.213:10036/api'
+
+    var vm = new Vue({
+        el: '#app',
+        data:{tableData: []},
+        created: function () {
+            axios.get(baseUrl + '/livingrecord')
+                .then(function (response) {
+                    vm.tableData = response.data.items;
+                    console.log("response: ", vm.tableData)
+                })
+        }
+    })
+</script>
+</html>

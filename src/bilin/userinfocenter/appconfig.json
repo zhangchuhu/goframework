@@ -1,0 +1,5 @@
+{
+"user_info_redis":"127.0.0.1:6669",
+"hu_jiao_db":"bilin_admin:avYsLkYwQ@tcp(58.215.143.9:6307)/Hujiao?charset=utf8&parseTime=True&loc=Local",
+"avatar_db":"bilin_admin:avYsLkYwQ@tcp(58.215.143.9:6307)/hujiaoavatarts0?charset=utf8&parseTime=True&loc=Local"
+}

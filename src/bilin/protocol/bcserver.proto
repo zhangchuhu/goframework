@@ -1,0 +1,413 @@
+syntax = "proto3";
+
+import "header.proto";
+import "push.proto";
+
+option go_package = "bilin";
+
+// 用于tars后端寻路 objname = bilin.bcserver.bcservantobj
+package bilin.bcserver;
+
+message EnterBroRoomReq{
+    Header header = 1;
+    string roompwd = 2;
+    USERFROM from = 3;
+}
+message EnterBroRoomResp{
+    CommonRetInfo commonret = 1;
+    AllRoomInfo allroominfo = 2;
+    string mediatoken = 3;
+    UserPrivilegeInfoInRoom privilegeinfo =4;
+}
+
+message GetAllRoomInfoReq {
+    Header header = 1;
+}
+
+message GetAllRoomInfoResp {
+    CommonRetInfo commonret = 1;
+    AllRoomInfo allroominfo = 2;
+}
+
+message ChangeBroRoomTypeReq {
+    Header header = 1;
+    BaseRoomInfo.ROOMTYPE roomtype = 2;
+}
+
+message ChangeBroRoomTypeResp{
+    CommonRetInfo commonret = 1;
+}
+
+message GetBroRoomUsersByPageReq {
+    Header header = 1;
+    uint32 pagenumber = 3; //页码
+}
+
+message GetBroRoomUsersByPageResp {
+    CommonRetInfo commonret = 1;
+    repeated UserInfo audienceusers = 2;
+}
+
+message ConnMediaResultReq{
+    Header header = 1;
+    enum CONMEDIARESULT{
+        SUCCESS = 0;
+        FAILED = 1;
+    }
+    CONMEDIARESULT connmediaresult = 2;
+}
+message ConnMediaResultResp{
+    CommonRetInfo commonret = 1;
+}
+
+message PingBroRoomReq{
+    Header header = 1;
+}
+message PingBroRoomResp{
+    CommonRetInfo commonret = 1;
+}
+
+message AudienceLinkOperationReq{
+    Header header = 1;
+    enum LINKOP{
+        LINK = 0; // 连麦
+        UNLINK = 1; // 取消连麦
+    }
+    LINKOP linkop = 2;
+    uint32 micknumber = 3; //麦位号
+}
+message AudienceLinkOperationResp{
+    CommonRetInfo commonret = 1;
+}
+
+message ExitBroRoomReq{
+    Header header = 1;
+}
+message ExitBroRoomResp{
+    CommonRetInfo commonret = 1;
+}
+
+message KickUserReq{
+    Header header = 1;
+    uint64 kickeduserid = 2; // 被踢用户id
+}
+message KickUserResp{
+    CommonRetInfo commonret = 1;
+}
+
+message ForbiddenUserReq{
+    Header header = 1;
+    uint64 forbiddenuserid = 2; // 被禁止公屏发言的用户ID
+    bool opt = 3;  // true 禁止公屏聊天, false 解除禁止
+}
+
+message ForbiddenUserResp{
+    CommonRetInfo commonret = 1;
+}
+
+message ForbiddenRoomReq{
+    Header header = 1;
+    string hostnotifytext = 2; // 主持人通知文案
+    string audiencenotifytext = 3;  // 普通用户通知文案
+}
+
+message ForbiddenRoomResp{
+    CommonRetInfo commonret = 1;
+}
+
+message RoomPrivilegeInfoReq{
+    Header header = 1;
+}
+
+message RoomPrivilegeInfoResp{
+    CommonRetInfo commonret = 1;
+    UserPrivilegeInfoInRoom privilegeinfo = 2;
+}
+
+message MuteUserReq {
+    Header header = 1;
+    uint64 muteuserid = 2; // 被静音用户id
+    enum MUTEOPT{
+            NOMUTE = 0; // 解除静音
+            MUTE = 1; // 静音
+        }
+    MUTEOPT opt = 3;
+}
+
+message MuteUserResp {
+    CommonRetInfo commonret = 1;
+}
+
+message MuteResultReq {
+    Header header = 1;
+    MuteUserReq.MUTEOPT opt = 2;
+}
+
+message MuteResultResp {
+    CommonRetInfo commonret = 1;
+}
+
+// 主持人禁麦和开麦
+message MikeOperationReq{
+    Header header = 1;
+    uint64 userid = 2; // 被抱麦用户id
+    enum MIKEOPT{
+            UNMIKE = 0; // 下麦
+            ONMIKE = 1; // 上麦
+            LOCKMIKE = 3; // 锁定麦位
+            UNLOCKMIKE = 4; // 解锁麦位
+        }
+    MIKEOPT opt = 3;
+
+    uint32 mikeidx = 4; //麦位
+}
+message MikeOperationResp{
+    CommonRetInfo commonret = 1;
+}
+
+message ChangeBroRoomLinkStatusReq{
+    Header header = 1;
+    BaseRoomInfo.LINKSTATUS linkstatus = 2;
+}
+
+message ChangeBroRoomLinkStatusResp{
+    CommonRetInfo commonret = 1;
+}
+
+message ChangeBroRoomAutoToMikeStatusReq{
+    Header header = 1;
+    BaseRoomInfo.AUTOLINK autolink = 2;
+}
+
+message ChangeBroRoomAutoToMikeStatusResp{
+    CommonRetInfo commonret = 1;
+}
+
+message BroRoomPraiseReq{
+    Header header = 1;
+    uint32 PraiseCount = 2; // 点赞数
+}
+message BroRoomPraiseResp{
+    CommonRetInfo commonret = 1;
+}
+
+message GetBroRoomPreparedAudienceReq {
+    Header header = 1;
+}
+
+message GetBroRoomPreparedAudienceResp {
+    CommonRetInfo commonret = 1;
+    repeated UserInfo preparedusers = 2;
+}
+
+message SendRoomMessageReq {
+    Header header = 1;
+    bytes data = 2;
+}
+
+message SendRoomMessageResp {
+    CommonRetInfo commonret = 1;
+}
+
+message KaraokeOperationReq {
+    Header header = 1;
+    BaseRoomInfo.KARAOKESWITCH opt = 2;
+}
+
+message KaraokeOperationResp {
+    CommonRetInfo commonret = 1;
+}
+
+message KaraokeAddSongReq {
+    Header header = 1;
+    string songName = 2;
+    string resourceid = 3; //歌曲资源ID
+}
+
+message KaraokeAddSongResp {
+    CommonRetInfo commonret = 1;
+}
+
+message KaraokeStartSingReq {
+    Header header = 1;
+    string songid = 2;
+}
+
+message KaraokeStartSingResp {
+    CommonRetInfo commonret = 1;
+}
+
+message KaraokeSongSetTopReq {
+    Header header = 1;
+    string songid = 2;
+}
+
+message KaraokeSongSetTopResp {
+    CommonRetInfo commonret = 1;
+}
+
+message KaraokeDelSongReq {
+    Header header = 1;
+    string songid = 2;
+}
+
+message KaraokeDelSongResp {
+    CommonRetInfo commonret = 1;
+}
+
+message KaraokePauseSongReq {
+    Header header = 1;
+    string songid = 2;
+}
+
+message KaraokePauseSongResp {
+    CommonRetInfo commonret = 1;
+}
+
+message KaraokeTerminateSongReq {
+    Header header = 1;
+    string songid = 2;
+    uint32  flag = 3; //0: 播放完之后正常结束  1: 异常结束（没播放，或者在播放中被结束）
+}
+
+message KaraokeTerminateSongResp {
+    CommonRetInfo commonret = 1;
+}
+
+//主持人清空排麦列表
+message ClearRoomPreparedAudienceReq {
+    Header header = 1;
+}
+
+message ClearRoomPreparedAudienceResp {
+    CommonRetInfo commonret = 1;
+}
+
+//主持人锁定/解锁房间
+message LockUnlockRoomOperationReq {
+    Header header = 1;
+    uint32 opt = 2; // 0: 解锁   1: 锁定
+    string pwd = 3; //密码
+}
+
+message LockUnlockRoomOperationResp {
+    CommonRetInfo commonret = 1;
+}
+
+service BCServant {
+    //直播间+连麦主逻辑请求
+
+    /*
+    进入直播间请求
+    */
+    rpc EnterBroRoom(EnterBroRoomReq) returns (EnterBroRoomResp);
+
+    /*
+    客户端连接媒体结果通知
+    */
+    rpc ConnMediaResult(ConnMediaResultReq) returns (ConnMediaResultResp);
+
+    /*
+    直播间PING请求
+    */
+    rpc PingBroRoom(PingBroRoomReq) returns (PingBroRoomResp);
+
+    /*
+    观众请求麦位、取消麦位
+    */
+    rpc AudienceLinkOperation(AudienceLinkOperationReq) returns (AudienceLinkOperationResp);
+
+    /*
+    用户离开直播间通知
+    */
+    rpc ExitBroRoom(ExitBroRoomReq) returns (ExitBroRoomResp);
+
+
+    // 直播间管理请求
+
+    /*
+    直播间踢人
+    */
+    rpc KickUser(KickUserReq) returns (KickUserResp);
+
+    /*
+    直播间禁麦和开麦
+    */
+    rpc MikeOperation(MikeOperationReq) returns (MikeOperationResp);
+
+    /*
+    更改直播间连线状态
+    */
+    rpc ChangeBroRoomLinkStatus(ChangeBroRoomLinkStatusReq) returns (ChangeBroRoomLinkStatusResp);
+
+    /*
+    是否开启自动连麦
+    */
+    rpc ChangeBroRoomAutoToMikeStatus(ChangeBroRoomAutoToMikeStatusReq) returns (ChangeBroRoomAutoToMikeStatusResp);
+
+    // 直播间互动旁路逻辑
+
+    /*
+    右下角点击,客户端聚合请求
+    */
+    rpc BroRoomPraise(BroRoomPraiseReq) returns(BroRoomPraiseResp);
+
+    // 主播获取申请连线用户
+    rpc GetBroRoomPreparedAudience(GetBroRoomPreparedAudienceReq) returns (GetBroRoomPreparedAudienceResp);
+
+    // 主持人设置台上嘉宾静音
+    rpc MuteUser(MuteUserReq) returns (MuteUserResp);
+
+    // 被静音的用户给服务器报结果
+    rpc MuteResult(MuteResultReq) returns (MuteResultResp);
+
+    // 主持人设置禁止公屏发言
+    rpc ForbiddenUser(ForbiddenUserReq) returns (ForbiddenUserResp);
+
+    // 发送公屏消息
+    rpc SendRoomMessage(SendRoomMessageReq) returns (SendRoomMessageResp);
+
+    // 客户端主动获取房间全量信息
+    rpc GetAllRoomInfo(GetAllRoomInfoReq) returns (GetAllRoomInfoResp);
+
+    // 客户端切换模板   BaseRoomInfo.ROOMTYPE
+    rpc ChangeBroRoomType(ChangeBroRoomTypeReq) returns (ChangeBroRoomTypeResp);
+
+    // 客户端请求分页列表信息
+    rpc GetBroRoomUsersByPage(GetBroRoomUsersByPageReq) returns (GetBroRoomUsersByPageResp);
+
+    // 客户端主动拉取特权信息
+    rpc GetRoomPrivilegeInfo(RoomPrivilegeInfoReq) returns (RoomPrivilegeInfoResp);
+
+    // 运营后台通知禁止某个直播间
+    rpc ForbiddenRoom(ForbiddenRoomReq) returns (ForbiddenRoomResp);
+
+    //K歌相关rpc通信 均以Karaoke开头
+
+    // 主持人开启/关闭K歌功能
+    rpc KaraokeOperation(KaraokeOperationReq) returns (KaraokeOperationResp);
+
+    // 主持人或者嘉宾点歌
+    rpc KaraokeAddSong(KaraokeAddSongReq) returns (KaraokeAddSongResp);
+
+    // 主持人开始播放歌曲
+    rpc KaraokeStartSing(KaraokeStartSingReq) returns (KaraokeStartSingResp);
+
+    // 主持人对某个歌曲置顶
+    rpc KaraokeSongSetTop(KaraokeSongSetTopReq) returns (KaraokeSongSetTopResp);
+
+    // 主持人或者嘉宾删除歌曲
+    rpc KaraokeDelSong(KaraokeDelSongReq) returns (KaraokeDelSongResp);
+
+    // 主持人或者嘉宾暂停歌曲
+    rpc KaraokePauseSong(KaraokePauseSongReq) returns (KaraokePauseSongResp);
+
+   // 主持人或者嘉宾结束歌曲
+   rpc KaraokeTerminateSong(KaraokeTerminateSongReq) returns (KaraokeTerminateSongResp);
+
+   // 主持人清空排麦列表 只有关闭自动连麦时才能清空
+   rpc ClearRoomPreparedAudience(ClearRoomPreparedAudienceReq) returns (ClearRoomPreparedAudienceResp);
+
+   // 房间锁定/解锁
+   rpc LockUnlockRoomOperation(LockUnlockRoomOperationReq) returns (LockUnlockRoomOperationResp);
+}

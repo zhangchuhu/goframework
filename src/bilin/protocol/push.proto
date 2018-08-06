@@ -1,0 +1,539 @@
+syntax = "proto3";
+
+package bilin;
+
+// 这个文件定义所有的push消息。
+// 其它的proto文件只定义rpc消息。
+
+// ServerPush是服务端推送到客户端的最外层协议包
+message ServerPush {
+    sint32 messageType    = 1;  // 大类型 MaxType
+    bytes  pushBuffer     = 2;  // 内层协议(小类型和消息内容)
+    map<string, string> headers = 3;
+    string messageDesc    = 4;  // 可选，调试用
+    string serviceName    = 5;  // 可选，调试用
+    string methodName     = 6;  // 可选，调试用
+}
+
+// MaxType是大类型所有可能的取值。
+enum MaxType {
+    MaxType_DO_NOT_USE = 0;
+
+    BC_MSG = 1; // 直播间新后台 BcMessageBody
+    LOGIN_ELSEWHERE = 9; // 在别处登入 CommonMessageBody
+
+    COMMON_MSG = 304;  //客户端接受涂鸦等广播信息，CommonMessageBody,对应旧协议GET_COMMON_MSG_FROM_ALL_RES
+
+    MATCH_MSG = 600;  //新随机匹配相关广播。CommonMessageBody
+    FLOWER_MSG = 601;  //鲜花服务器相关广播。CommonMessageBody
+    CC_MSG = 602;     //呼叫控制服务ccserver相关广播。CommonMessageBody
+
+    PUSH_MSG = 88888;    // push通知，PushProxyReqFromJava，对应旧协议PUSH_MSG_TO_CLIENT
+
+}
+
+message BcMessageBody {
+    int32 type = 1; // 小类型 MinType
+    bytes data = 2; // 消息内容
+}
+
+message CommonMessageBody {
+    int32 type = 1; // 小类型 MinType
+    bytes data = 2; // 消息内容
+}
+
+
+// push通知
+message PushProxyReqFromJava{
+    int32 busi_type = 1;  //业务类型 1.好友申请 2未接来电 3申请通话等等 对应MinType_PUSH
+    int64 from_userid   =2;
+    int32 tips_count =3;  //消息提醒数
+    int32 have_voice  =4;   //是否有声音
+    string body =5;     //提醒的消息
+    string para = 6;    //java服务器调用
+}
+
+//push通知的类型
+
+enum MinType_PUSH { // MaxType = PUSH_MSG
+    BLPushTypeNeverUsed = 0; //不要使用
+    BLPushTypeFriendRequest = 1; // 好友请求
+    BLPushTypeMissCall = 2; // 未接来电
+    BLPushTypeApplyCall = 3; // 申请通话
+    BLPushTypeAcceptApplyCall = 4; // 同意来电申请
+    BLPushTypeComment = 5; // 评论
+    BLPushTypeReplyComment = 6; // 回复评论
+    BLPushTypePraise = 7; // 赞
+    BLPushTypeUploadImage = 8; // 上传图片; 老版本使用
+    BLPushTypeChat = 9; // 聊天消息
+    BLPushTypeSystem = 10; // 系统消息
+    BLPushTypeStatus = 11; // 发布动态消息
+    BLPushTypeReceiveCall = 12; // 收到来电
+    BLPushTypeAgreeFriendRequest = 13; // 同意好友请求
+    BLPushTypeMoreClientLogin = 14; //多设备登录
+    BLPushTypeDeleteFriend = 15;    //删除好友
+    BLPushTypeMyBlackList = 16;     //更新自己黑名单列表
+    BLPushTypeBlackListInOther = 17; //更新自己所在的黑名单列表
+    BLPushTypeNewTask = 18; //任务中心配发了新任务
+    BLPushTypeFinishTask = 19; // 有新任务完成，收到该push应同时拉取奖励
+    BLPushTypeTaskDidUpdate = 20; // 任务进度有更新
+    BLPushTypeNewRandomCallLeadFinish = 21;//新手引导任务完成
+    BLPushTypeFriendChat = 22;//新增push类型22代表收到文字消息的发送者与接受者的关系为（好友关系）
+    BLPushTypeReplyChat = 23;//新增push类型23代表收到文字消息的发送者与接受者的关系为（发送者回复招呼）
+    BLPushTypeRecentChat = 24;//新增push类型24代表收到文字消息的发送者与接受者的关系为（发送者刚刚上线打招呼）
+    BLPushTypeRandomChat = 25;//新增push类型25代表收到文字消息的发送者与接受者的关系为（发送者随机呼叫中聊天）
+    BLPushTypeInMainNotFriendChat = 26;//新增push类型26代表收到文字消息的发送者与接受者的关系为（发送者非好友关系，但是在首页中聊天）
+    BLPushTypeDiscussionMsg = 27;//讨论组消息
+    BLPushTypeSuperPowerEvaluation = 31; // 超能力评价中心有新消息
+    BLPushTypeAttentionMeMsg = 32; // 收到一个被其他人关注的消息
+    BLPushTypeCancelAttentionMeMsg = 33; // 收到一个取消关注我的消息
+    BLPushTypeRecieveUserMoodMsg = 34; // 收到新的小心情
+    BLPushTypeGreetingInitMsg = 37; //没有回复过的用户发来的消息
+    BLPushTypeGreetingReplyMsg = 38; //回复过的用户发来的消息
+    BLPushTypeIntimacyUpgradeMsg = 39; //亲密度升级
+    BLPushTypeIntimacyDegrateMsg = 40; //亲密度降级
+    BLPushAttentionHostStartLiveMsg = 41;//关注的主播开播
+    BLMePushAttentionHostStartLiveMsg = 42;//关注的ME主播开播
+    BLVoicePushAttentionHostStartLiveMsg = 43; //关注的主播语音开播
+    BLReservedPushStartLiveMsg = 44; // 预订的直播
+    BLPushTypeForbidden = 45; //账号被禁用
+    BLPushTypeDeleteForbiddenMessage = 46; // 删除违规消息
+
+    BLPushTypeUploadlogMsg       = 47; // 通知客户端上传日志
+}
+
+enum MinType_BC { // MaxType = BC_MSG
+    MinType_BC_DO_NOT_USE = 0;
+
+    NotifyBaseRoomInfo     = 1; // 直播间基本信息 BaseRoomInfo
+    NotifyRoomMickListInfo = 2; // 直播间麦序变化 RoomMickListInfo
+    NotifyRoomUserListInfo = 3; // 直播间用户变化 RoomUserListInfo
+    NotifyRoomKickUser     = 4; // 直播间踢人 KickNotify
+    NotifyUserBeForbidden  = 5; // 用户被禁止公屏发言 ForbiddenNotify
+    NotifyRoomLinkStatus   = 6; // 连线状态被修改 LinkNotify
+    NotifyRoomPraise       = 7; // 直播间点赞通知 PraiseNotify
+    NotifyRoomAudienceMute = 8;  // 告知被静音操作的观众设置静音操作 MuteNotify
+    NotifyAllRoomInfo      = 9;  // 直播间所有信息，包含用户列表，麦序，排麦人数等，用于用户断线重连时推送给user AllRoomInfo
+    NotifyRoomMickOpt      = 10;  // 直播间用户上下麦通知 MikeNotify
+    NotifyRoomForbiddenList      = 11;  // 直播间被禁言公屏发言列表 RoomForbiddenList
+    NotifyRoomUserListChange      = 12;  // 直播间用户退出 UserListChangeNotify
+    NotifyRoomClosed      = 13;     // 直播间涉嫌违规被关闭 ClosedRoomNotify
+    NotifyRoomClearPreparedAudience      = 14;     //清空排麦列表ClearRoomPreparedAudienceNotify
+
+    //K歌相关的通知类型
+    NotifyPreparationSong = 15;     //即将演唱的歌曲预告PreparationSongNotify   不做该推送，统一从点歌列表里面获取
+    NotifySongsList = 16;            //当前点歌列表SongsListNotify
+    NotifySongSetTop = 17;          //歌曲被主持人置顶  单播SongSetTopNotify  并发送广播当前列表
+    NotifyDelSong = 18;             //删除歌曲  单播DelSongNotify  并发送广播当前列表
+    NotifyStartSing = 19;           //主持人开始播放歌曲StartSingNotify  不会发广播列表
+    NotifyPauseSong = 20;           //暂停歌曲PauseSongNotify   不会发广播列表
+    NotifyTerminateSong = 21;       //结束歌曲TerminateSongNotify   广播结束通知，并发送广播列表
+    NotifyAddSong = 22;             //用户点歌之后需要广播  AddSongNotify
+    //K歌相关通知结束
+
+    //麦上大表情
+    NotifyBigExpression = 23;       //麦上大表情广播  BigExpressionBroadcast
+    //麦上大表情
+}
+
+enum MinType_CC { // MaxType = CC_MSG
+    MinType_CC_DO_NOT_USE = 0;
+
+    CLIENT_P2P_TUNNEL = 1; // 客户端发起的组播透传通道，必须在房间内使用
+}
+
+enum MinType_COMMON { // MaxType = COMMON_MSG
+    MinType_Tunnel_DO_NOT_USE = 0;
+
+    DRAW_PICTURE_REQ	      = 1001; // 涂鸦
+
+    MULTI_R_CALL_CHANGE_SUPER_TAG_REQ = 1002; // TODO
+    MULTI_R_CALL_DICE_REQ             = 1003; // TODO
+    START_REC_REQ                     = 1004; // TODO
+    STOP_REC_REQ                      = 1005; // TODO
+    REC_OP_RESULT_REQ                 = 1006; // TODO
+    DOUBLE_CALL_DICE_REQ              = 1007; // TODO
+
+    IM_MSG                    = 1008; // 公屏
+    OFFICIAL_ON_MIKE          = 1009; // 官频上麦
+    OFFICIAL_OFF_MIKE         = 1012; // 官频下麦
+
+    P2P_BEGIN            = 2000; // TODO
+    SEND_FLOWER_REQ		 = 2001; // TODO
+    ADD_FRIEND_REQ	 	 = 2002; // TODO
+    ACCEPT_FRIEND_REQ	 = 2003; // TODO
+    REFUSE_FRIEND_REQ 	 = 2004; // TODO
+    ATTENT_USER_REQ      = 2005; // TODO
+
+    //client to cc
+    //broadcast
+    DRAW_PICTURE_RES	              = 3001; // TODO
+    MULTI_R_CALL_SUPER_TAG_CHAGE_RES  = 3002; // TODO
+    MULTI_R_CALL_UPDATE_HOT_TOPIC_RES = 3003; // TODO
+    MULTI_R_CALL_DICE_RES             = 3004; // TODO
+    MULTI_R_CALL_UPDATE_DICE_TOPIC_RES= 3005; // TODO
+    DISCUSSION_GROUP_LIMIT_RES        = 3006; // TODO “创建讨论组限制条件”的文案消息
+    START_REC_RES                     = 3007; // TODO
+    STOP_REC_RES                      = 3008; // TODO
+    REC_OP_RESULT_RES                 = 3009; // TODO
+    DOUBLE_CALL_DICE_RES              = 3010; // TODO
+    HOT_LINE_NOTICE_RES               = 3011; // TODO
+
+    //p2p
+    SEND_FLOWER_RES        = 4001; // TODO
+    ADD_FRIEND_RES         = 4002; // TODO
+    ACCEPT_FRIEND_RES      = 4003; // TODO
+    REFUSE_FRIEND_RES      = 4004; // TODO
+    ATTENT_USER_RES        = 4005; // TODO
+    INVOKE_THRIFT_INFO_RES = 4006; // TODO
+
+    TURNOVER_MSG_NOTICE       = 5001; // 营收服务通道消息
+    OPERATETOOLBOX            = 6000; // 直播间玩法(真心话/大冒险/摇骰子)
+    GUARDWING_BROACAST        = 6001; // 直播间守护翅膀广播
+    ROOM_MUSIC_STATUS_RES     = 6003;//播放音乐时服务器透传 广播大类型是6003
+    ACTIVE_TASK_UNICAST       = 6500; // 活动任务单播
+    OFFICIALCHANNEL_UNICAST   = 6501; // 官频消息推送
+
+    REDPACKET_COMING_BROADCAST = 7000; // 收到红包广播
+    REDPACKET_FINISH_BROADCAST = 7001; // 红包到期广播
+    REDPACKET_GRAB_BROADCAST   = 7002; // 用户抢到多少红包广播
+}
+
+
+
+// -----------------------------------------
+// 下面是所有推送消息内容的定义，对应上面的类型表
+// -----------------------------------------
+
+message BaseRoomInfo{
+    uint64 roomid = 1;
+
+    enum ROOMSTATUS{
+        OPEN = 0;
+        CLOSED = 1;
+        FORBIDDEN = 2;
+    }
+    ROOMSTATUS roomstatus = 2;
+
+    enum ROOMTYPE{
+        ROOMTYPE_UNKNOW = 0;
+        ROOMTYPE_THREE = 1;
+        ROOMTYPE_SIX = 2;
+        ROOMTYPE_RADIO = 3;
+    }
+    ROOMTYPE roomtype = 3;
+
+    enum LINKSTATUS{
+        CLOSELINK = 0;  //关闭连线
+        OPENLINK = 1;   //开启连线
+    }
+    LINKSTATUS linkstatus = 4;
+
+    string title = 5;
+    uint32 totalmicknumber = 6; // 当前直播间麦位个数
+    UserInfo host = 7;
+    uint32 mikewaitingusers = 8; //排麦等待用户个数
+    uint32 totalusersnumber = 9; //直播间总人数
+    int32 roomType2 = 10; // Officail_room, UGC_room，PGC_room
+    int32 roomCategoryID = 11;
+    int32 roomPendantLevel = 12;
+    int64 hostBilinID = 13;
+    int32 pageUsersCount = 14;   // 分页列表每页人数
+
+    enum AUTOLINK{
+        CLOSEAUTOTOMIKE = 0;  //关闭自动上麦
+        OPENAUTOTOMIKE = 1;   //开启自动上麦
+    }
+    AUTOLINK autolink = 15;    // 是否开启自动上麦
+
+    enum MAIXUSWITCH{
+        CLOSEMAIXU = 0;  //关闭麦序
+        OPENMAIXU = 1;  //打开麦序
+    }
+    MAIXUSWITCH maixuswitch = 16;  //服务器用来管理客户端模板和麦序的开关
+
+    enum KARAOKESWITCH{
+        CLOSEKARAOKE = 0;  //关闭
+        OPENKARAOKE = 1;  //打开
+    }
+    KARAOKESWITCH karaokeswitch = 17;  //K歌开关
+
+    enum RELATIONLISTESWITCH{
+        CLOSERELATIONLIST = 0;  //关闭
+        OPENRELATIONLIST  = 1;  //打开
+    }
+    RELATIONLISTESWITCH relationlistswitch = 18;  //亲密榜开关
+
+    uint64 owneruid = 19;  //主播uid，主播不在直播间也会显示
+}
+
+//房间功能区
+message RoomBizInfo{
+    uint32 lockStatus = 1; // 0: 未锁  1: 锁定
+}
+
+// 房间全量基础信息
+message AllRoomInfo{
+    BaseRoomInfo baseinfo = 1;
+
+    repeated UserInfo audienceusers = 2;
+    repeated MikeInfo mikeinfo = 3;
+    RoomForbiddenList forbiddenuids = 4;
+    UserPrivilegeInfoInRoom privilegeInfo = 5;
+    AllRoomKaraokeInfo karaokeinfo = 6;
+    RoomBizInfo bizinfo = 7;
+}
+message RoomMickListInfo{
+    repeated MikeInfo mikeinfo = 12;
+    uint32 mikewaitingusers = 13;
+    BaseRoomInfo.ROOMTYPE roomtype = 14;
+}
+
+message RoomUserListInfo{
+    uint32 totalusersnumber = 1; //直播间总人数
+    repeated UserInfo audienceusers = 11;
+}
+
+message RoomForbiddenList{
+    repeated uint64 uids = 1;
+}
+
+message UserInfo{
+    uint64 userid = 1;
+    string nick = 2; // 昵称
+    string avatarurl = 3; // 头像
+    uint32 fanscount = 4;
+    USERFROM from = 5;
+    uint32 mute = 6;
+    uint32 sex = 7; // 性别 0=女 1=男
+    uint32 age = 8; // 年龄
+    string cityName = 9; // 城市
+    string signature = 10; // 个性签名
+}
+
+//用户在房间的特权信息
+message UserPrivilegeInfoInRoom{
+    string headgear = 1;        // 头像框
+    string medalurl = 2;        // 勋章地址
+    string medaltext = 3;       // 勋章文案
+}
+
+enum USERFROM {
+    ROOMLIST = 0;
+    SEARCH = 1;
+    BROADCAST = 2;
+}
+
+message MikeInfo{
+    enum MIKEWHEATSTATUS {
+        EMPTY = 0;
+        USED = 1;
+        LOCK = 2;
+    }
+    MIKEWHEATSTATUS mikewheatstatus = 1; //麦位状态  0： 空， 1： 有人  2：锁定
+    uint32 mikeindex = 2;
+    UserInfo userinfo = 10;
+}
+
+message PraiseNotify {
+    uint32 count = 1;
+}
+
+message MuteNotify {
+    uint64 optuserid = 1; // 主持人ID，为了和老版本兼容，需要加上该字段
+    uint32 opt = 2;           // 0: 解除静音   1: 设置静音
+}
+
+message KickNotify {
+    uint64 optuserid = 2; // 主持人ID，为了和老版本兼容，需要加上该字段
+}
+
+message MikeNotify {
+    uint64 optuserid = 1; // 主持人ID，为了和老版本兼容，需要加上该字段
+    uint32 opt = 2; // 0: 下麦   1: 上麦
+}
+
+message ForbiddenNotify {
+    uint64 optuserid = 1; // 主持人ID，为了和老版本兼容，需要加上该字段
+    uint32 opt = 2;           // 0: 解除禁言   1: 禁止公屏发言
+}
+
+//房间涉嫌违规，需要关闭，通知直播间所有用户
+message ClosedRoomNotify {
+    string hostnotifytext = 1; // 主持人通知文案
+    string audiencenotifytext = 2;  // 普通用户通知文案
+}
+
+//K歌相关的push通知
+
+message KaraokeSongInfo {
+    string id = 1;              //每首歌都有一个唯一ID
+    string resourceid = 2;     //歌曲资源ID，由客户端上传，服务器保存，并下发
+    string songName   = 3;      //演唱歌曲名
+    UserInfo userinfo = 4;
+    enum SONGSTATUS {
+        PREPARE = 0;    //准备状态,默认状态
+        SINGING = 1;    //正在演唱状态
+        PAUSE = 2;      //暂停状态
+    }
+    SONGSTATUS status = 5;
+}
+
+//即将演唱的歌曲预告
+message PreparationSongNotify {
+    KaraokeSongInfo song = 1;
+}
+
+//**点了歌曲
+message AddSongNotify {
+    KaraokeSongInfo song = 1;
+}
+
+//当前点歌列表
+message SongsListNotify {
+    repeated KaraokeSongInfo songs = 1;
+}
+
+//歌曲被主持人置顶
+message SongSetTopNotify {
+    KaraokeSongInfo song = 1;
+}
+
+//删除歌曲
+message DelSongNotify {
+    KaraokeSongInfo song = 1;
+}
+
+//主持人开始播放歌曲
+message StartSingNotify {
+    KaraokeSongInfo song = 1;
+}
+
+//暂停歌曲
+message PauseSongNotify {
+    KaraokeSongInfo song = 1;
+}
+
+//结束歌曲
+message TerminateSongNotify {
+    KaraokeSongInfo song = 1;
+    uint64 optuserid = 2; // 操作者uid,主持人或者演唱者
+}
+
+//房间内所有K歌相关信息
+message AllRoomKaraokeInfo {
+    repeated KaraokeSongInfo songs = 3;     // 点歌列表
+}
+
+// K歌相关push结束
+
+//主持人清空排麦列表
+message ClearRoomPreparedAudienceNotify {
+
+}
+
+message UserListChangeNotify{
+    repeated UserInfo enterusers = 1;
+    repeated uint64 exituids = 2;
+}
+
+enum MinType_MATCH { // MaxType = MATCH_MSG
+    MinType_MATCH_DO_NOT_USE = 0;
+
+    OPTIONALMATCHINGRESULT_MINTYPE     = 1; // 可选结果广播
+    MATCHINGRESULT_MINTYPE = 2;    // 匹配结果广播
+    TALKACTION_MINTYPE = 3; // 通话操作广播
+    BROADCASTONLINEUSERCOUNT_MINTYPE = 4; // 在线人数广播
+    APPLYTALKING_MINTYPE = 5; //申请通话
+    REPORTTALKING_MINTYPE = 6; // 查询,报告通话状态
+}
+
+message UserChatTagSummary {
+    int64 touserid = 1; //用户uid
+    int64 totaltagnum = 2; //该聊天标签总次数
+    int64 tagid = 3; // 标签id
+    string tagname = 4; // 标签名称
+    string tagcolor = 5; // 标签颜色
+}
+message UserChatTagSummaryS {
+    repeated UserChatTagSummary summary = 1;
+}
+
+//可选结果广播
+message MatchUserInfo
+{
+	uint32  uid = 1;
+	int32   sex = 2;        // 性别 0：男 1：女
+	string  postion = 3;    //用户位置
+	string  nick = 4;       //昵称
+	string  avatar = 5;       //头像
+	int32   isonline = 6;     //是否在线
+	int32   age = 7;         //年龄
+	repeated string gifs = 8;		 // 多张动态图
+	map<string, string> userTag = 9;  //标签
+    UserChatTagSummaryS userChatTag = 10; //用户聊天标签
+}
+
+message OptionalMatchingResult
+{
+		string   matchid = 1;   //匹配结果id
+		repeated MatchUserInfo attendees = 2; //被匹配上的人的信息.如果是1v3的异性匹配话，第一个用户就是女性用户
+}
+
+//匹配结果广播
+message MatchingResult
+{
+	bool  isSelected = 1;    //是否被选中，true为被选中，false没被选中。被选中的会把建立连接用的token之类的带上
+}
+
+//申请通话单播
+message ApplyTalkingNotify {
+	uint32  requestUid = 1;
+    uint32  operation = 2;  //操作请求，0：请求通话；1：取消通话；2：正在通话中
+    uint64  applyid = 3; //被叫发起的ApplyTalkingRequest，使用主叫通知的applyid
+}
+
+//查询,报告通话状态单播
+message ReportTalkingNotify {
+    uint32 requestUid = 1;
+    uint32 status = 2;   // 通话状态，0：正在呼叫中；1：不在呼叫中
+    uint64 reportid = 3; // 被叫发起的ReportTalkingRequest，使用主叫通知的reportid
+}
+
+//通话操作广播
+message TalkingAction
+{
+    uint32 operation = 1;  //操作请求，0：请求通话；1：取消通话；
+    string token = 2;        //调用媒体云用到的token
+    uint32 cid = 3;       //调用媒体云用的频道id
+    uint32 cancelReason = 4; //取消通话的原因，0: 对方主动挂断；1：心跳超时挂断
+}
+
+//在线人数广播
+message BroadcastOnlineUserCount
+{
+    uint32  onlineUserCount = 1;//在线人数
+	uint32  maleCount = 3;
+	uint32  femaleCount = 4;
+}
+
+enum MinType_FLOWER { // MaxType = FLOWER_MSG
+    MinType_FLOWER_DO_NOT_USE = 0;
+
+    SENDFLOWERBROCAST_MINTYPE     = 1; // 可选结果广播
+}
+
+message SendFloweBC
+{
+    uint32 fromUserid = 1;  //赠送用户uid
+    uint32 count    = 2;     //赠送鲜花数
+}
+
+//麦上大表情广播
+message BigExpressionBroadcast
+{
+     uint64 from_uid = 1;
+     uint32 id = 2;    //道具id,一个道具对应一个id
+     uint32 result_index = 3;
+     repeated uint32 result_indexes = 4;
+}

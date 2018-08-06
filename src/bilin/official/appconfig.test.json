@@ -1,0 +1,4 @@
+{
+  "rate_limite_rate": 200,
+  "hu_jiao_call_db": "bilin_admin:avYsLkYwQ@tcp(58.215.143.9:6307)/Hujiao?charset=utf8&parseTime=True&loc=Local"
+}

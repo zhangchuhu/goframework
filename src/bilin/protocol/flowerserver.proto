@@ -1,0 +1,36 @@
+syntax = "proto3";
+
+import "header.proto";
+
+option go_package = "bilin";
+package bilin.flowerserver;
+
+
+message QueryUsableFlowerCountRequest
+{
+    uint32 uid = 1;
+}
+
+message QueryUsableFlowerCountRespone
+{
+    uint32 count = 1;    //可用鲜花数
+    CommonRetInfo cret = 2;
+}
+
+
+message SendFlowerRequest
+{
+    uint32 toUser = 1;    //收花对象
+}
+
+message SendFlowerRespone
+{
+    uint32 result  = 1;   //送花结果，0成功，1失败
+    uint32 count = 2;     //当天剩余可用花朵数
+    CommonRetInfo cret = 3;
+}
+
+service FlowerServant {
+    rpc QueryUsableFlowerCount(QueryUsableFlowerCountRequest) returns (QueryUsableFlowerCountRespone);
+    rpc SendFlower(SendFlowerRequest) returns (SendFlowerRespone);
+}

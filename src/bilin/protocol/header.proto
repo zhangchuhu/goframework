@@ -1,0 +1,95 @@
+syntax = "proto3";
+
+package bilin;
+
+// 这个文件定义所有的rpc消息的公共部分
+// rpc消息请求应答成对，命名遵循 XxxReq 和 XxxResp
+// XxxReq里应该都有 Header
+// XxxResp里应该都有 CommonRetInfo
+
+message Header{
+    uint64 userid = 2;
+    uint64 roomid = 3;
+    enum EXTENDKEY{
+        VERSION = 0;
+    }
+    map<uint32, string> mapextend = 4;
+}
+
+message CommonRetInfo{
+    enum RETCODE{
+        RETCODE_SUCCEED = 0;
+        ILLEGAL_MESSAGE = 100;
+        // 进出直播间
+        ENTER_ROOM_FAILED = 10001;
+        ENTER_USER_NO_RIGHT = 10002;
+        ENTER_ROOM_NOT_START = 10003;
+        ENTER_BAD_NETWORK = 10004;
+        ENTER_ROOM_CLOSED = 10005;
+        ENTER_ROOM_LOCKED = 10006;
+        ENTER_ROOM_PWDERR = 10007;
+        ENTER_ROOM_ALREADY_IN_ROOM = 10008;
+        ENTER_ROOM_FORBIDDEN = 10009;
+        // link opreation
+        AUDIENCE_LINK_OPERATION_FAILED  = 20001;
+        AUDIENCE_LINK_OPERATION_FULL_MEMBER = 20002;
+        AUDIENCE_LINK_OPERATION_STATUS_ERR   = 20003;
+        // mike opreation
+        MIKE_OPREATION_FAILED = 30001;
+        MIKE_OPREATION_USER_NOT_IN_ROOM = 30002;
+        MIKE_STAGE_IS_FULL = 30003;
+        MIKE_STAGE_NO_RIGHT = 30004;
+        MIKE_WHEAT_IS_USED = 30005;
+        // 踢人
+        KICK_USER_FAILED = 40001;
+        KICK_USER_NOT_IN_ROOM = 40002;
+        KICK_USER_NO_RIGHT    = 40003;
+        // ChangeBroRoomLinkStatus
+        CHANGE_ROOM_LINK_STATUS_FAILED = 50001;
+        CHANGE_ROOM_LINK_STATUS_NO_RIGHT = 50002;
+        // GetBroRoomPreparedAudience
+        GET_ROOM_LINK_AUDIENCE_FAILED = 60001;
+        GET_ROOM_LINK_AUDIENCE_NO_RIGHT = 60002;
+        // MuteUser
+        MUTE_USER_FAILED = 70001;
+        MUTE_USER_NOT_IN_ROOM = 70002;
+        MUTE_USER_NO_RIGHT = 70003;
+        MUTE_USER_NOT_ON_MIKE = 70004;
+        // MuteResult
+        MUTE_RESULT_FAILED = 71001;
+        MUTE_RESULT_NOT_ON_MIKE = 71002;
+        // ForbiddenUser
+        FORBIDDEN_USER_FAILED = 80001;
+        FORBIDDEN_USER_NOT_IN_ROOM = 80002;
+        FORBIDDEN_USER_NO_RIGHT = 80003;
+        //切换模板
+        CHANGE_ROOM_TYPE_NO_RIGHT = 90001;
+        CHANGE_ROOM_TYPE_INVALID  = 90002;
+
+        //ChangeBroRoomAutoToMikeStatus
+        CHANGE_ROOM_AUTO_TO_MIKE_FAILED = 51001;
+        CHANGE_ROOM_AUTO_TO_MIKE_NO_RIGHT = 51002;
+        // random call
+
+        //Karaoke
+        KARAOKE_OPT_NO_RIGHT = 52000;
+        KARAOKE_SONG_NOT_EXIST = 52001;
+        KARAOKE_SONG_ALREADY_IN_SINGING = 52002;
+        KARAOKE_SONG_NOT_START = 52003;
+        KARAOKE_SONG_SETTOP_FAILED = 52004;
+        KARAOKE_SONG_DEL_FAILED = 52005;
+        KARAOKE_SONG_ADD_FAILED = 52006;
+        KARAOKE_SONG_CHANGESTATUS_FAILED = 52007;
+        KARAOKE_SONG_TERMINATE_FAILED = 52008;
+        KARAOKE_SWTICH_CLOSED = 52009;
+
+        //LockUnlockRoom
+        LOCKUNLOCK_NO_RIGHT = 52100;
+        LOCKUNLOCK_FAILED = 52101;
+
+        // im
+    }
+    RETCODE ret = 1;  // 错误码
+    string desc = 2;  // 详细错误信息
+    bool show = 3;    // 是否显示toast
+}

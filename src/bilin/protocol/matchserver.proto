@@ -1,0 +1,182 @@
+﻿syntax = "proto3";
+
+import "header.proto";
+
+option go_package = "bilin";
+package bilin.matchserver;
+
+
+// 匹配请求
+message MatchRandomCallReq{
+	int32   sex = 1;        // 性别 0：男 1：女
+	int32   matchType = 2; // 匹配类型，0：异性:1：同性
+	string   province = 3;   // 省份拼音缩写
+	map<string, string> userTag = 4;  //用户其他标签
+}
+
+message MatchRandomCallResp{
+	int32 result = 1;				// 请求调用结果 0:成功 1：失败
+	string error_desc = 2;			// 失败原因
+	uint32  onlineUserCount = 3;   //在线人数
+	uint32  maleCount = 4;
+	uint32  femaleCount = 5;
+    CommonRetInfo cret = 6;
+}
+
+//退出随机匹配
+message CancleMatchRandomReq
+{
+	int32   sex = 1;        // 性别 0：男 1：女
+	int32   matchType = 2; // 匹配类型，0：异性:1：同性
+	string   province = 3;   // 省份拼音
+	string   matchid = 4;   //匹配结果id 0:还没匹配上，非0 表示匹配上了人matchid
+}
+
+message CancleMatchRandomResp
+{
+	int32 result = 1;				// 请求调用结果 0:成功 1：失败
+	string error_desc = 2;		// 失败原因
+    CommonRetInfo cret = 3;
+}
+
+
+//选择结果，
+message SelectMatchingResultReq
+{
+		string   matchid = 1;   //匹配结果id
+		uint32  uid = 2;	      //选择的uid，如果为0则表示一个都没有选
+}
+
+message SelectMatchingResultResp
+{
+	int32 result = 1;				// 请求调用结果 0:成功 1：失败	
+	string error_desc = 2;		// 失败原因
+    CommonRetInfo cret = 3;
+}
+
+
+//请求、取消通话
+message ApplyTalkingRequest
+{
+	uint32  requestUid = 1;
+	uint32  unicastUid = 2;
+	uint32  operation = 3;  //操作请求，0：请求通话；1：取消通话；2：正在通话中
+    uint64  applyid = 4;    //客户端填写，服务器透传，唯一标识一次申请流程
+}
+
+message ApplyTalkingRespone
+{
+	int32 result = 1;				// 请求调用结果 0：成功；1：失败；2：对方不在线
+	string error_desc = 2;			// 失败原因
+    CommonRetInfo cret = 3;
+}
+
+message ReportTalkingRequest
+{
+	uint32 requestUid = 1;
+	uint32 unicastUid = 2;
+	uint32 status = 3;       // 通话状态，0：正在呼叫中；1：不在呼叫中
+	uint64 reportid = 4;     // 客户端填写，服务器透传，唯一标识一次查询流程
+}
+
+message ReportTalkingResponse
+{
+	int32 result = 1;        // 请求调用结果 0：成功；1：失败；2：对方不在线
+	string error_desc = 2;   // 失败原因
+    CommonRetInfo cret = 3;
+}
+
+//开始通话
+message TalkingRequest
+{
+	uint32  requestUid = 1;
+	uint32  unicastUid = 2;
+	uint32  operation = 3;  //操作请求，0：请求通话；1：取消通话；
+	uint32  type = 4; // 通话类型，0：未知；1：直呼；2：异性匹配；3：同性匹配；
+}
+
+message TalkingRespone
+{
+	int32 result = 1;				// 请求调用结果 0:成功 1：失败	
+	string error_desc = 2;			// 失败原因
+    CommonRetInfo cret = 3;
+}
+
+
+//心跳
+message TalkingHeartbeatRequest
+{
+	uint32  uid = 1;
+}
+
+message TalkingHeartbeatRespone
+{
+	int32 result = 1;				// 请求调用结果 0:成功 1：失败	
+	string error_desc = 2;			// 失败原因
+    CommonRetInfo cret = 3;
+}
+
+//获取安慰语
+message GetComfortWordRequest
+{
+	uint32  uid = 1;
+}
+
+message GetComfortWordRespone
+{
+	int32 result = 1;			// 请求调用结果 0:成功 1：失败
+	string error_desc = 2;		// 失败原因
+	string comforWord = 3;     // 安慰语 空表示不需要提示安慰语
+    CommonRetInfo cret = 4;
+}
+
+// 获取随机头像请求
+message GetRandomAvatarReq{
+	uint32   uid = 1;  
+	int32    sex = 2;        		// uid的性别 0：男 1：女    
+}
+
+message GetRandomAvatarResp{
+	int32 result = 1;				// 请求调用结果 0:成功 1：失败
+	string error_desc = 2;			// 失败原因
+	repeated string avatars = 3;  	// 随机头像
+    CommonRetInfo cret = 4;
+}
+
+service MatchServant{
+    rpc MatchRandomCall(MatchRandomCallReq) returns (MatchRandomCallResp);
+    rpc CancleMatchRandom(CancleMatchRandomReq) returns (CancleMatchRandomResp);
+	rpc SelectMatchingResult(SelectMatchingResultReq) returns (SelectMatchingResultResp);
+	rpc ApplyTalking(ApplyTalkingRequest) returns (ApplyTalkingRespone);
+	rpc ReportTalking(ReportTalkingRequest) returns (ReportTalkingResponse);
+	rpc Talking(TalkingRequest) returns (TalkingRespone);
+	rpc TalkingHeartbeat(TalkingHeartbeatRequest) returns (TalkingHeartbeatRespone);
+	rpc GetComfortWord(GetComfortWordRequest) returns (GetComfortWordRespone);
+	rpc GetRandomAvatar(GetRandomAvatarReq) returns (GetRandomAvatarResp);
+}
+
+/*
+用户发起随机匹配请求或者更改匹配的对象性别时，客户端发 MatchRandomCallReq 到服务器，协议里面有个 matchType 字段，用来区分匹配目标是同性还是异性
+当服务器收到请求并且把用户加入到等待匹配的队列时， 会返回协议 MatchRandomCallResp 给客户端
+
+当用户关闭随机匹配功能时，客户端发请求 CancleMatchRandomReq 到服务器。服务器收到请求后把用户从待匹配队列中删除
+
+
+当用户成功匹配上之后，服务器会向客户端广播协议 OptionalMatchingResult ，这个协议会有两个字段，第一个是matchid,这个字段的用户会用到。
+第二个字段是匹配上的用户列表，
+对于1v3而言，列表的第一个用户只会是女性用户，后面3个是匹配上的男性用户
+对于1v1而言，就只是把匹配上的两个用户按照随机顺序加入到列表中，客户端自行读取自己和对方的信息，这样处理有没有问题？
+
+在收到这个广播之后，客户端就进入选择是否和用户通话的界面。
+如果用户在6s内没有做任何选择，则客户端发请求 SelectMatchingResultReq 到服务器，其中，matchid就是上面广播中的matchid，uid填0
+如果用户在6s内选择了某个uid，则客户端发请求 SelectMatchingResultReq 到服务器，其中，matchid就是上面广播中的matchid，uid就是用户选择的uid
+
+服务器在收到用户的选择结果之后SelectMatchingResultReq 之后，会发广播 MatchingResult 给参与的用户。
+如果用户被选中， isSelected 为true，且建立通话需要用到的频道id和token都会在这个广播中带给客户端
+如果用户没有被选择，isSelected 为false，客户端重新发起随机匹配功请求
+
+
+客户端在开始通话和结束通话的时候，由触发动作的用户发一条 TalkingRequest 到服务器，服务器在收到请求之后会单播 TalkingAction 给参与通话的客户端，
+如果是建立通话，TalkingAction 会带上频道id以及建立通话要用的token，在收到这个广播之后调用媒体云的接口
+
+*/

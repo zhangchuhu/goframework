@@ -1,0 +1,36 @@
+syntax="proto3";
+
+package pbtaf;
+
+message RequestPacket{
+    int32 IVersion =1 ;
+    enum PacketType {
+        TARSNORMAL = 0;
+        TARSONEWAY = 1; // not support
+    };
+    PacketType CPacketType = 2;
+    int32 IMessageType = 3;
+    int32 IRequestId = 4;
+    string SServantName = 5;
+    string SFuncName = 6;
+    bytes SBuffer = 7;
+    int32 ITimeout = 8;
+    map<string, string> Context = 9;
+    map<string, string> Status = 10;
+}
+
+message ResponsePacket {
+    int32 IVersion  =1 ;
+    enum PacketType {
+        TARSNORMAL = 0;
+        TARSONEWAY = 1; // not support
+    };
+    PacketType CPacketType = 2;
+    int32 IRequestId =3;
+    int32 IMessageType = 4;
+    int32 IRet = 5 ;
+    bytes SBuffer = 6;
+    map<string, string> Status = 7;
+    string SResultDesc  = 8;
+    map<string, string> Context = 9;
+}

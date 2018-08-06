@@ -1,0 +1,28 @@
+说明:
+tars自动生成工具,IDL使用grpc的IDL定义
+
+依赖说明:
+
+1 依赖protobuf的生成工具protoc,使用的是pb3版本,已经放到tools目录下面
+https://github.com/google/protobuf/releases
+
+安装说明:
+go get code.yy.com/yytars/protoc-gen-tars
+go install code.yy.com/yytars/protoc-gen-tars
+
+选择对应的系统,安装protoc
+mac:
+cp $GOPATH/src/code.yy.com/yytars/protoc-gen-tars/tools/protoc-3.5.1-osx-x86_64/bin/protoc $GOPATH/bin/protoc3
+
+linux:
+cp $GOPATH/src/code.yy.com/yytars/protoc-gen-tars/tools/protoc-3.5.1-linux-x86_64/bin/protoc $GOPATH/bin/protoc3
+
+使用说明:
+
+1 go版本
+
+protoc3 --tars_out=plugins=tars2go:. hello.proto
+
+2 其他版本生成（暂不支持）
+
+protoc3 --tars_out=plugins=tars2cxx:. hello.proto

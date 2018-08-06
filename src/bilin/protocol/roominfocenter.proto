@@ -1,0 +1,52 @@
+syntax = "proto3";
+
+option go_package = "bilin";
+package bilin.roominfocenter;
+
+message RoomInfo{
+    uint64 roomid = 1;
+    uint64 starttime = 2; // 直播开始时间
+    uint64 usernumber = 3;//用户个数
+    int32 roomcategoryID = 4; //频道所属品类ID
+    uint64 owner = 5 ; // 当前开播主播
+    string title = 6; // 房间标题
+    int32 roomType2 = 7; // Officail_room, UGC_room，PGC_room
+    uint64 ownerBilinID = 8;
+    int32 LockStatus = 9; // 0 未锁，1 锁定
+}
+message LivingRoomsInfoReq {
+}
+message LivingRoomsInfoResp {
+    map<uint64,RoomInfo> livingrooms = 1;
+}
+
+message BatchLivingRoomsInfoByHostsReq{
+    repeated uint64 hosts = 1; //需要查询的主播uid集合
+}
+message BatchLivingRoomsInfoByHostsResp{
+    map<uint64,RoomInfo> livingrooms = 1; // hostid --> roominfo
+}
+
+message IsLivingReq{
+    int64 roomid = 1;
+}
+message IsLivingResp{
+    bool isliving = 1; //true在开播，false不在开播
+}
+
+service RoomInfoServant {
+    /*
+    所有正在开播的直播间信息
+    */
+    rpc LivingRoomsInfo (LivingRoomsInfoReq) returns (LivingRoomsInfoResp);
+
+    /*
+    根据发送的主播信息，返回开播的房间信息
+    */
+    rpc BatchLivingRoomsInfoByHosts(BatchLivingRoomsInfoByHostsReq) returns (BatchLivingRoomsInfoByHostsResp);
+
+    /*
+    查询指定房间是否在开播
+    */
+    rpc IsLiving(IsLivingReq) returns(IsLivingResp);
+}

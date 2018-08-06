@@ -1,0 +1,356 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>土豪头像框设置</title>
+  <!--<link rel="stylesheet" href="css/index.css">-->
+  <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+  <style type="text/css">
+    .center-cropped {
+      width: 100px;
+      height: 100px;
+      background-position: center center;
+      background-repeat: no-repeat;
+    }
+    </style>
+</head>
+<body>
+  <div id="app">
+    <div style="width: 30%; margin:0 auto">
+      <el-input v-model="inputsearch" style="width:200px;" placeholder="请输入用户uid"></el-input>
+      <el-button type="primary" icon="el-icon-search" @click="searchUser">搜索</el-button>
+      <el-button type="info" @click="addUser">增加用户</el-button>
+    </div>
+    <el-table :data="tableData" style="width: 60%; margin:0 auto">
+      <el-table-column label="uid" width="180" align="center">
+        <template slot-scope="scope">
+          <!-- <i class="el-icon-time"></i> -->
+          <span style="margin-left: 10px">{{ scope.row.userid }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column label="头像框" width="180" align="center">
+        <template slot-scope="scope">
+          <img class="center-cropped"  :src=scope.row.headgear>
+        </template>
+      </el-table-column>
+       <el-table-column label="生效时间" width="180" align="center">
+        <template slot-scope="scope">
+          <span style="margin-left: 10px">{{scope.row.effecttime}}</span>
+        </template>
+      </el-table-column>
+      <el-table-column label="过期时间" width="180" align="center">
+        <template slot-scope="scope">
+          <span style="margin-left: 10px">{{ scope.row.expiretime }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column label="操作" width="180" align="center">
+        <template slot-scope="scope">
+          <el-row>
+            <el-button type="primary" icon="el-icon-edit" @click="handleEdit(scope.$index, scope.row)" circle></el-button>
+            <el-button type="danger" icon="el-icon-delete" @click="handleDelete(scope.$index, scope.row)" circle></el-button>
+          </el-row>
+        </template>
+      </el-table-column>
+    </el-table>
+
+    <el-dialog
+            title="警告!"
+            :visible.sync="centerDialogVisible"
+            width="30%"
+            center>
+      <span>确定要删除吗？</span>
+      <span slot="footer" class="dialog-footer">
+          <el-button @click="centerDialogVisible = false">取 消</el-button>
+          <el-button type="primary" @click="confirmDelete">确 定</el-button>
+      </span>
+    </el-dialog>
+
+
+    <el-dialog :visible.sync="addDialogVisible" title="增加用户" width="30%" center>
+      <el-form :model="currentClickItem" label-position="right" label-width="92px" style="width: 80%; max-width: 560px; margin-left:50px;">
+        <el-form-item label="用户uid">
+          <el-input v-model="currentClickItem.userid" placeholder=""></el-input>
+        </el-form-item>
+        <el-form-item label="头像框">
+          <el-upload
+                  class="avatar-uploader"
+                  :action="uploadUrl"
+                  :show-file-list="false"
+                  :auto-upload="true"
+                  :on-change="changeFile"
+                  :http-request="uploadFunc"
+          >
+            <img v-if="currentClickItem.headgear" class="center-cropped avatar" :src="currentClickItem.headgear">
+            <i v-else class="el-icon-plus avatar-uploader-icon"></i>
+          </el-upload>
+        </el-form-item>
+        <el-form-item label="开始时间">
+          <el-date-picker type="datetime" v-model="currentClickItem.effecttime"
+                          align="right" placeholder="选择开始时间" value-format="yyyy-MM-dd HH:mm:ss"></el-date-picker>
+        </el-form-item>
+        <el-form-item label="过期时间">
+          <el-date-picker type="datetime" v-model="currentClickItem.expiretime"
+                          align="right" placeholder="选择过期时间" value-format="yyyy-MM-dd HH:mm:ss"></el-date-picker>
+        </el-form-item>
+      </el-form>
+
+      <div slot="footer">
+        <el-button @click="cancleAdd">取消</el-button>
+        <el-button type="primary" @click=updateItem(currentClickItem,'add') >确定</el-button>
+      </div>
+
+    </el-dialog>
+
+
+    <el-dialog :visible.sync="dialogVisible" title="设置" width="30%" center>
+      <el-form :model="currentClickItem" label-position="right" label-width="92px" style="width: 80%; max-width: 560px; margin-left:50px;">
+        <el-form-item label="用户uid">
+          <el-input v-model="currentClickItem.userid" placeholder="" :disabled="true"></el-input>
+        </el-form-item>
+        <el-form-item label="头像框">
+          <el-upload
+                  class="avatar-uploader"
+                  :action="uploadUrl"
+                  :show-file-list="false"
+                  :auto-upload="true"
+                  :on-change="changeFile"
+                  :http-request="uploadFunc"
+                  >
+            <img v-if="currentClickItem.headgear" class="center-cropped avatar" :src="currentClickItem.headgear">
+            <i v-else class="el-icon-plus avatar-uploader-icon"></i>
+          </el-upload>
+        </el-form-item>
+        <el-form-item label="开始时间">
+          <el-date-picker type="datetime" v-model="currentClickItem.effecttime"
+                          align="right" placeholder="选择开始时间" value-format="yyyy-MM-dd HH:mm:ss"></el-date-picker>
+        </el-form-item>
+        <el-form-item label="过期时间">
+          <el-date-picker type="datetime" v-model="currentClickItem.expiretime"
+                          align="right" placeholder="选择过期时间" value-format="yyyy-MM-dd HH:mm:ss"></el-date-picker>
+        </el-form-item>
+      </el-form>
+
+      <div slot="footer">
+        <el-button @click="cancleUpdate(currentClickItem)">取消</el-button>
+        <el-button type="primary" @click="updateItem(currentClickItem,'update')" >确定</el-button>
+      </div>
+
+    </el-dialog>
+
+  </div>
+</body>
+  <script src="js/vue.js"></script>
+  <!--<script src="js/index.js"></script>-->
+  <script src="https://unpkg.com/element-ui/lib/index.js"></script>
+  <script src="js/axios.js"></script>
+  <script src="http://code.jquery.com/jquery-latest.js"></script>
+  <script src="js/resizeImage.js"></script>
+  <script>
+    var baseUrl = 'http://58.215.52.165:10037/api'
+
+    var userRequest = {
+        uri: "search",
+        "data": {
+            "userid": 0,
+            "headgear": "",
+            "effecttime": "2018-06-06",
+            "expiretime": "2018-06-06"
+        }
+    }
+
+    var vm = new Vue({
+        el: '#app',
+        data: {tableData: [],
+            dialogVisible: false,
+            addDialogVisible: false,
+            currentClickItem: {},
+            currentDelItem: {},
+            uploadUrl: "",
+            downloadUrl: "",
+            uploadHeaders: {},
+            uploadFile: null,
+            inputsearch:"",
+            centerDialogVisible: false
+        },
+        created: function () {
+            axios.get(baseUrl + '/totaldata')
+                .then(function (response) {
+                    vm.tableData = response.data.items;
+                })
+          },
+        methods: {
+            refreshWindow: function () {
+                axios.get(baseUrl + '/totaldata')
+                    .then(function (response) {
+                        vm.tableData = response.data.items;
+                    })
+            },
+            resetDialogData :function () {
+                this.currentClickItem = {}
+                this.uploadUrl = ""
+                this.downloadUrl = ""
+                this.uploadFile = ""
+
+                this.addDialogVisible = false;
+                this.dialogVisible = false;
+            },
+
+            //截取饿了么的自动上传函数，先把file记录下来，等点击确定时再上传文件
+            uploadFunc: function (param) {
+                vm.uploadFile = param.file
+            },
+            addUser:function () {
+              vm.addDialogVisible = true;
+            },
+            cancleAdd:function () {
+                vm.resetDialogData()
+            },
+                    handleEdit: function(index, row) {
+                        vm.currentClickItem = row;
+                        vm.dialogVisible = true;
+                    },
+                    updateItem:function(row, opt) {
+
+                        if(vm.currentClickItem.effecttime > vm.currentClickItem.expiretime) {
+                            alert('过期时间必须大于生效时间');
+                            return
+                        }
+
+                        if (vm.uploadFile == undefined || vm.uploadFile == null || vm.uploadFile == "") {
+                            row.userid = parseInt(row.userid, 10);
+                            axios.post(baseUrl + '/vip/headgear',{
+                                uri: opt,
+                                data: row
+                            }).then(function (response) {
+                                console.log("response: ", response);
+                                if (response.data.result != 0) {
+                                    console.log("error: ", response.data.result);
+                                    if (response.data.result == 2) {
+                                        alert("用户已经存在");
+                                    }
+                                    else {
+                                        alert("操作失败");
+                                    }
+                                }
+
+                                vm.refreshWindow()
+                            })
+
+                            vm.resetDialogData()
+                            return
+                        }
+
+                        resizeImage({
+                            file: vm.uploadFile,
+                            quality: 1,
+                            trim: true,
+                            success: function(result) {
+                                $.ajax({
+                                    url: vm.uploadUrl,
+                                    data: result.blob,
+                                    type: "PUT",
+                                    cache: false,
+                                    contentType: false, //必须
+                                    processData: false, //必须
+                                    headers: vm.uploadHeaders,
+                                    timeout: 5000,
+                                    error: function(jqXHR, textStatus, errorThrown) {
+                                        new Dialog({
+                                            type: "confirm",
+                                            showCancelButton: false,
+                                            canClickLayerHide: true,
+                                            dialogClass: "sign-tip sign-edit-tip",
+                                            content: '<p class="center">头像上传失败！</p>',
+                                            confirmCallback: function(){
+                                            }
+                                        });
+                                    },
+                                    success: function(data, textStatus, jqXHR) {
+                                        console.log("success upload file!")
+                                        row.headgear = vm.downloadUrl
+                                        row.userid = parseInt(row.userid, 10);
+                                        axios.post(baseUrl + '/vip/headgear',{
+                                            uri: opt,
+                                            data: row
+                                        }).then(function (response) {
+                                            console.log("response: ", response);
+                                            if (response.data.result != 0) {
+                                                console.log("error: ", response.data.result);
+                                            }
+
+                                            vm.refreshWindow()
+                                        })
+
+                                        vm.resetDialogData()
+                                    }
+                                });
+                            }
+                        });
+
+                        vm.dialogVisible = false;
+                    },
+                    cancleUpdate:function(row) {
+                        vm.resetDialogData()
+                    },
+                    handleDelete:function(index, row) {
+                        vm.centerDialogVisible = true
+                        vm.currentDelItem = row
+                    },
+                    confirmDelete:function () {
+                        vm.centerDialogVisible = false
+                        axios.post(baseUrl + '/vip/headgear',{
+                                  uri:"del",
+                                  data: vm.currentDelItem
+                            }).then(function (response) {
+                                console.log("response: ", response);
+
+                                vm.tableData=vm.tableData.filter(item=>item!==vm.currentDelItem);
+
+                                if (response.data.result != 0) {
+                                    console.log("error: ", response.data.result);
+                                }
+                            })
+                    },
+                    searchUser:function () {
+                        if(vm.inputsearch.length == 0)
+                        {
+                            vm.refreshWindow()
+                            return
+                        }
+
+                        userRequest.data.userid = parseInt(vm.inputsearch, 10)
+                        axios.post(baseUrl + "/vip/headgear", userRequest)
+                            .then(function (response) {
+                                console.log("response: ", response.data.data);
+                                if (response.data.result != 0) {
+                                    console.log("error: ", response.data.result);
+                                } else {
+                                    vm.tableData = []
+                                    vm.tableData.push(response.data.data);
+                                }
+                            })
+                    },
+                    changeFile:function(file, fileList) {
+                        console.log("changeFile function", file, fileList)
+
+                        vm.currentClickItem.headgear = file.url
+                        //get token from server
+                        axios.get(baseUrl + '/token?filename='+file.name)
+                            .then(function (response) {
+                                console.log("response.data: ", response.data);
+                                vm.uploadUrl = response.data.uploadurl
+                                vm.downloadUrl = response.data.downloadurl
+                                vm.uploadHeaders['Authorization'] = response.data.token
+                            })
+                    },
+                    handleError: function(err, file, fileList) {
+                        console.log("handleError: ", err, file, fileList)
+                    },
+                    handleSuccess: function(response, file, fileList) {
+                        console.log("handleSuccess: ", response, file, fileList)
+                    },
+      }
+    })
+  </script>
+</html>

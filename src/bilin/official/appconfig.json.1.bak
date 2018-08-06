@@ -1,0 +1,4 @@
+{
+  "rate_limite_rate": 200,
+  "hu_jiao_call_db": "hujiao@HujiaoCall:egZ2XV8aT@tcp(221.228.79.244:8066)/Hujiao?readTimeout=500ms&charset=utf8&parseTime=True&loc=Local"
+}

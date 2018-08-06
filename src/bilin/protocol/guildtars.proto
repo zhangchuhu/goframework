@@ -1,0 +1,144 @@
+syntax = "proto3";
+
+option go_package = "bilin";
+package bilin.guildtars;
+
+import "confinfocenter.proto";
+
+message CategoryGuildRecByOwUidReq{
+    int64 owuid = 1;
+}
+message CategoryGuildRecByOwUidResp{
+    repeated bilin.confinfocenter.CategoryGuildRecInfo info = 1;
+}
+
+message Contract{
+    int64 id = 1;
+    int64 guildid = 2;
+    int64 hostuid = 3;
+    int64 contractstarttime = 4;
+    int64 contractendtime = 5;
+    int64 guildsharepercentage = 6;
+    int64 hostsharepercentage = 7;
+    int32 contractstate = 8;
+}
+message CContractReq{
+    Contract info = 1;
+}
+message CContractResp{
+}
+message RContractReq {
+    Contract filter = 1;
+}
+message RContractResp {
+    repeated Contract info = 1;
+}
+message UContractReq{
+    Contract info = 1;
+}
+message UContractResp{
+}
+message DContractReq{
+    Contract info = 1;
+}
+message DContractResp{
+}
+
+message Guild{
+    int64 id = 1;
+    int64 ow = 2;
+    string title = 3;
+    string mobile = 4;
+    string describle = 5;
+    string guildlog = 6;
+}
+message CGuildReq{
+    Guild info = 1;
+}
+message CGuildResp{
+}
+message RGuildReq {
+    Guild filter = 1;
+}
+message RGuildResp {
+    repeated Guild info = 1;
+}
+message UGuildReq{
+    Guild info = 1;
+}
+message UGuildResp{
+}
+message DGuildReq{
+    Guild info = 1;
+}
+message DGuildResp{
+}
+
+message GuildRoom{
+    int64 id = 1;
+    int64 guildid = 2;
+    int64 roomid = 3;
+}
+message CGuildRoomReq{
+    GuildRoom info = 1;
+}
+message CGuildRoomResp{
+}
+message RGuildRoomReq {
+    GuildRoom filter = 1;
+}
+message RGuildRoomResp {
+    repeated GuildRoom info = 1;
+}
+message UGuildRoomReq{
+    GuildRoom info = 1;
+}
+message UGuildRoomResp{
+}
+message DGuildRoomReq{
+    GuildRoom info = 1;
+}
+message DGuildRoomResp{
+}
+
+message OAMLoginReq{
+    string username = 1;
+    string passwd = 2;
+}
+message OAMLoginResp{
+    string token = 1;
+}
+
+service GuildTars {
+    //根据工会的owuid，查询对应的房间信息
+    rpc CategoryGuildRecByOwUid(CategoryGuildRecByOwUidReq) returns (CategoryGuildRecByOwUidResp);
+
+    /*
+    签约信息CRUD
+    */
+    rpc CContract(CContractReq) returns(CContractResp);
+    rpc RContract (RContractReq) returns (RContractResp);
+    rpc UContract(UContractReq) returns (UContractResp);
+    rpc DContract(DContractReq) returns(DContractResp);
+
+    /*
+    工会信息CRUD
+    */
+    rpc CGuild(CGuildReq) returns(CGuildResp);
+    rpc RGuild (RGuildReq) returns (RGuildResp);
+    rpc UGuild(UGuildReq) returns (UGuildResp);
+    rpc DGuild(DGuildReq) returns(DGuildResp);
+
+    /*
+    工会房间CRUD
+    */
+    rpc CGuildRoom(CGuildRoomReq) returns(CGuildRoomResp);
+    rpc RGuildRoom (RGuildRoomReq) returns (RGuildRoomResp);
+    rpc UGuildRoom(UGuildRoomReq) returns (UGuildRoomResp);
+    rpc DGuildRoom(DGuildRoomReq) returns(DGuildRoomResp);
+
+    /*
+    工会管理后台登录
+    */
+    rpc OAMLogin(OAMLoginReq) returns(OAMLoginResp);
+}

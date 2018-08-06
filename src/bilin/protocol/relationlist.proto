@@ -1,0 +1,53 @@
+syntax = "proto3";
+
+import "header.proto";
+
+option go_package = "bilin";
+package bilin.relationlist;
+
+message RelationInfo{
+   uint64   bilinid = 1;          //用户uid
+   string   nick = 2;             //用户昵称
+   string   avatar = 3;           //用户头像
+   string   headgear = 4;         //用户头像框，仅排名前三名才有
+   uint64   relationvalue = 5;    //亲密值
+}
+
+//用户上下麦操作
+message RSUserMikeOptionReq
+{
+    Header header = 1;
+    uint64 owner = 2;       //主播uid
+    enum MIKEOPT{
+            UNMIKE = 0; // 下麦
+            ONMIKE = 1; // 上麦
+        }
+    MIKEOPT opt = 3;
+}
+
+message RSUserMikeOptionResp
+{
+    CommonRetInfo commonret = 1;
+}
+
+message GetUserRelationMedalReq
+{
+    Header header = 1;
+    uint64 owner = 2;       //主播uid
+}
+
+message GetUserRelationMedalResp
+{
+    CommonRetInfo commonret = 1;
+    uint32 medalid = 2;         //勋章等级
+    string medalname = 3;       //勋章名
+    string medalUrl = 4;        //勋章图片地址
+}
+
+service RelationListServant {
+    //用户上下麦 RS --> Relation Servant
+    rpc RSUserMikeOption(RSUserMikeOptionReq) returns (RSUserMikeOptionResp);
+
+    //获取亲密度勋章数据
+    rpc GetUserRelationMedal(GetUserRelationMedalReq) returns (GetUserRelationMedalResp);
+}

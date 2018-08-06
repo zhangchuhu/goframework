@@ -1,0 +1,51 @@
+syntax = "proto3";
+
+import "header.proto";
+
+option go_package = "bilin";
+package bilin.operationmanagement;
+
+message HeadgearInfo{
+   uint64 uid = 1;          //用户uid
+   string headgear = 2;     //用户头像框
+   int64  effecttime = 3;   //生效时间--时间戳
+   int64  expiretime = 4;   //过期时间--时间戳
+   int64  id = 5;           //头像框ID
+}
+
+//活动发放 头像框
+message ActDistributionHeadgearRequest
+{
+    HeadgearInfo hinfo = 1;
+}
+
+message BatchActDistributionHeadgearRequest
+{
+    repeated HeadgearInfo  hinfos = 1;
+}
+
+message ActDistributionHeadgearRespone
+{
+    CommonRetInfo commonret = 1;
+}
+
+message GetUserHeadgearInfoReq
+{
+    uint64 uid = 1; //用户uid
+}
+
+message GetUserHeadgearInfoResp
+{
+    CommonRetInfo commonret = 1;
+    HeadgearInfo hinfo = 2;
+}
+
+service OperationManagementServant {
+    //活动发放头像框
+    rpc ActDistributionHeadgear(ActDistributionHeadgearRequest) returns (ActDistributionHeadgearRespone);
+    //一次发送多个头像框给用户
+    rpc BatchActDistributionHeadgear(BatchActDistributionHeadgearRequest) returns (ActDistributionHeadgearRespone);
+
+    //查询某个uid用户的头像框信息
+    rpc GetUserHeadgearInfo(GetUserHeadgearInfoReq) returns (GetUserHeadgearInfoResp);
+}

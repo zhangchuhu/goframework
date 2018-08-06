@@ -1,0 +1,8 @@
+{
+  "rate_limite_rate": 200,
+ "hu_jiao_call_db":"blguildadmin:1oCrqMZYwr@tcp(14.116.173.148:6305)/Hujiao?readTimeout=500ms&charset=utf8mb4&parseTime=True&loc=Local",
+"bi_data_db":"bilin_bi_data@bilin_bi_data:kT2pa8Yq@tcp(221.228.79.244:8066)/bilin_bi_data?charset=utf8&parseTime=True&loc=Local",
+"contract_thrift_addr":"101.226.22.226:6907;101.226.22.227:6907;101.226.185.108:6907",
+"turn_over_thrift_addr":"101.226.22.226:6903;101.226.22.227:6903;222.73.62.150:6903",
+"corsacao":"https://pgbilin.yy.com"
+}

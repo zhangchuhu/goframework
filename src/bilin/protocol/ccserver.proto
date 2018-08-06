@@ -1,0 +1,59 @@
+syntax = "proto3";
+
+import "header.proto";
+
+option go_package = "bilin";
+package bilin.ccserver;
+
+
+// 请求随机电话同时在线数
+message GetRandomCallNumberClientReq {
+    Header header = 1;
+}
+
+message GetRandomCallNumberClientResp {
+    CommonRetInfo cret = 1;
+    int64 numberOfClient = 2;
+}
+
+// 生成唯一房间号
+message GenerateRoomReq {
+}
+
+message GenerateRoomResp {
+    CommonRetInfo cret = 1;
+    int64 roomID = 2;
+}
+
+// 客户端发送点对点消息
+// 对应的通知类型(MaxType)为602(@see push.proto)
+message SendMessageToUserReq {
+    Header header = 1;  // 发送者
+    repeated int64 toUserID = 2; // 接收者（可以有多个）
+    bytes data = 3;     // 内容
+}
+
+message SendMessageToUserResp {
+    CommonRetInfo cret = 1;
+}
+
+// 查询客户端在哪个房间
+message GetUserCurrentRoomReq {
+    Header header = 1;
+}
+
+message GetUserCurrentRoomResp {
+    CommonRetInfo cret = 1;
+    int64 roomID = 2;
+}
+
+service CCServant{
+    // 客户端首页拉取 called by app
+    rpc GetRandomCallNumberClient(GetRandomCallNumberClientReq) returns (GetRandomCallNumberClientResp);
+    // 生成唯一房间号（每次通话都使用一个由服务器生成的临时房间号）called by matchserver
+    rpc GenerateRoom(GenerateRoomReq) returns (GenerateRoomResp);
+    // 客户端发送点对点消息 uid1 -> uid2（服务端确保uid1和uid2必须在同一个房间内，才发送成功）called by app
+    rpc SendMessageToUser(SendMessageToUserReq) returns (SendMessageToUserResp);
+    // 查询客户端在哪个房间 called by java
+    rpc GetUserCurrentRoom(GetUserCurrentRoomReq) returns (GetUserCurrentRoomResp);
+}

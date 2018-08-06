@@ -1,0 +1,12 @@
+// 这里定义只在服务端使用的 protobuf 结构体，客户端无需关注
+syntax = "proto3";
+
+package bilin;
+
+import "push.proto";
+
+message MultiPush {
+    ServerPush msg         = 1;  // 具体的推送消息
+    repeated int64 userIDs = 2;  // 填一个用户就是单播，填多个用户就是组播
+    int32 appID            = 3;  // 目前总是为0
+}

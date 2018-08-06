@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+option go_package = "%{AppName}";
+package %{AppName}.%{ServiceName};
+
+message Request {
+    string name = 1;
+}
+
+message Response {
+    string greet = 1;
+}
+
+service %{ServantName} {
+    rpc SayGreeting (Request) returns (Response);
+}

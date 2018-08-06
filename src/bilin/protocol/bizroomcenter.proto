@@ -1,0 +1,109 @@
+syntax = "proto3";
+
+import "header.proto";
+
+option go_package = "bilin";
+package bilin.bizroomcenter;
+
+
+message BizRoomInfo{
+   uint64   roomid = 1;          //房间ID
+   uint32   lockstatus = 2;      //锁定状态
+   string   roompwd = 3;         //房间密码
+}
+
+message GetBizRoomInfoReq
+{
+    uint64 roomid = 1;
+}
+
+message GetBizRoomInfoResp
+{
+    CommonRetInfo commonret = 1;
+    BizRoomInfo bizroominfo = 2;
+}
+
+message BatchGetBizRoomInfoReq
+{
+    repeated uint64 roomids = 1;
+}
+
+message BatchGetBizRoomInfoResp
+{
+    CommonRetInfo commonret = 1;
+    map<uint64,BizRoomInfo> bizroominfos = 2;
+}
+
+message SetRoomPasswordReq
+{
+    uint64 roomid = 1;
+    string password = 2;
+}
+
+message SetRoomPasswordResp
+{
+    CommonRetInfo commonret = 1;
+}
+
+message RemoveRoomPasswordReq
+{
+    uint64 roomid = 1;
+}
+
+message RemoveRoomPasswordResp
+{
+    CommonRetInfo commonret = 1;
+}
+
+//获取房间锁定状态
+message GetBizRoomLockStatusReq
+{
+    uint64 roomid = 1;
+}
+
+message GetBizRoomLockStatusResp
+{
+    CommonRetInfo commonret = 1;
+    uint32   lockstatus = 2;
+}
+
+message BatchGetBizRoomLockStatusReq
+{
+    repeated uint64 roomids = 1;
+}
+
+message BatchGetBizRoomLockStatusResp
+{
+    CommonRetInfo commonret = 1;
+    repeated uint64 roomids = 2;  //只返回锁定的roomids
+}
+
+
+//获取所有锁定的房间列表
+message GetAllLockedRoomsReq
+{
+
+}
+
+message GetAllLockedRoomsResp
+{
+    CommonRetInfo commonret = 1;
+    repeated uint64 roomids = 2;
+}
+
+service BizRoomCenterServant {
+    //获取房间的基本业务信息
+    rpc GetBizRoomInfo(GetBizRoomInfoReq) returns (GetBizRoomInfoResp);
+    rpc BatchGetBizRoomInfo(BatchGetBizRoomInfoReq) returns (BatchGetBizRoomInfoResp);
+
+    //设置房间密码
+    rpc SetRoomPassword(SetRoomPasswordReq) returns (SetRoomPasswordResp);
+    rpc RemoveRoomPassword(RemoveRoomPasswordReq) returns (RemoveRoomPasswordResp);
+
+    //获取房间锁定状态
+    rpc GetBizRoomLockStatus(GetBizRoomLockStatusReq) returns (GetBizRoomLockStatusResp);
+    rpc BatchGetBizRoomLockStatus(BatchGetBizRoomLockStatusReq) returns (BatchGetBizRoomLockStatusResp);
+
+    //获取所有锁定的房间列表
+    rpc GetAllLockedRooms(GetAllLockedRoomsReq) returns (GetAllLockedRoomsResp);
+}

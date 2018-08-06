@@ -1,0 +1,250 @@
+syntax = "proto3";
+
+option go_package = "bilin";
+package bilin.confinfocenter;
+
+message GuildInfoReq{
+    uint64 roomid = 1;
+}
+message GuildInfoResp{
+    uint64 guildID = 1; // 工会信息
+}
+
+message LivingCategoryInfo{
+    int64 typeid = 1;
+    string name = 2;
+    string color = 3;
+    string backgroudimage = 4;
+    int64  sort  = 5; //权重
+}
+message LivingCategorysReq{
+}
+message LivingCategorysResp{
+    repeated LivingCategoryInfo livingcategorys = 1;
+}
+
+message CarouselInfo {
+    int64 id = 1;
+    string backgroudURL =2;
+    int32  targetType =3;
+    string targetURL =4;
+    int64  startTime =5;
+    int64  endTime =6;
+    string channel =7;
+    string version =8;
+    int32  forUserType =9;
+    int32  width = 10;
+    int32  height = 11;
+    int32 position = 12;
+    string hotlinetype = 13;
+}
+
+message CarouselReq{
+}
+message CarouselResp{
+    repeated CarouselInfo carousel = 1;
+}
+
+message BannerReq{
+    int64 typid = 1;
+}
+message BannerResp{
+    repeated CarouselInfo carousel = 1;
+}
+
+message CategoryStickieInfo{
+   int64 typeid = 1; //品类id
+   int64 sort = 2 ; // 排序权重
+   uint64 roomid = 3; // 直播间id
+   int64 starttime = 4; // 开始时间
+   int64 endtime = 5 ; // 截至时间
+   int64 id = 6;
+}
+
+message CategoryStickieReq{
+}
+message CategoryStickieResp{
+    map<uint64,CategoryStickieInfo > categoryinfo = 1; //roomid --- CategoryStickieInfo
+}
+message CreateCategoryStickieReq{
+    CategoryStickieInfo info = 1;
+}
+message CreateCategoryStickieResp{
+}
+message UpdateCategoryStickieReq{
+    CategoryStickieInfo info = 1;
+}
+message UpdateCategoryStickieResp{
+
+}
+message DelCategoryStickieReq{
+    CategoryStickieInfo info = 1;
+}
+message DelCategoryStickieResp{
+}
+message AvailableCategoryStickieReq{
+}
+message AvailableCategoryStickieResp{
+    repeated CategoryStickieInfo infos = 1;
+}
+
+message CategoryHostRecInfo{
+    uint64 hostid = 1;
+    uint64 typeid = 2;
+    int64 id = 3;
+}
+message CategoryHostRecReq{
+}
+message CategoryHostRecResp{
+    repeated CategoryHostRecInfo cateogryinfos = 1;
+}
+message CreateCategoryHostRecReq{
+    CategoryHostRecInfo info = 1;
+}
+message CreateCategoryHostRecResp{
+}
+message UpdateCategoryHostRecReq{
+    CategoryHostRecInfo info = 1;
+}
+message UpdateCategoryHostRecResp{
+}
+message DelCategoryHostRecReq{
+    CategoryHostRecInfo info = 1;
+}
+message DelCategoryHostRecResp{
+}
+
+message CategoryGuildRecInfo{
+    uint64 roomid = 1;
+    uint64 typeid = 2;
+    uint64 id = 3;
+}
+message CategoryGuildRecReq{
+}
+message CategoryGuildRecResp{
+    repeated CategoryGuildRecInfo cateogryguildinfos = 1;
+}
+
+message UpdateCategoryGuildRecReq{
+    CategoryGuildRecInfo info = 1;
+}
+message UpdateCategoryGuildRecResp{
+    CategoryGuildRecInfo info = 1;
+}
+message CreateCategoryGuildRecReq{
+    CategoryGuildRecInfo info =1;
+}
+message CreateCategoryGuildRecResp{
+}
+
+message DelCategoryGuildRecReq{
+    CategoryGuildRecInfo info = 1;
+ }
+ message DelCategoryGuildRecResp{
+}
+
+message GuildRoomInfo {
+    int64 id = 1;
+    int64 guildid = 2;
+    int64 roomid = 3;
+}
+message GuildRoomSReq{
+    GuildRoomInfo info = 1;
+}
+message GuildRoomSResp{
+    repeated GuildRoomInfo info = 1;
+}
+message DelGuildRoomReq{
+    GuildRoomInfo info = 1;
+}
+message DelGuildRoomResp {
+}
+message CreateGuildRoomReq{
+    GuildRoomInfo info = 1;
+}
+message CreateGuildRoomResp{
+}
+
+message UserBabgeInfo {
+    uint64 userid = 1;
+    string url = 2;
+}
+message UserBabgeReq{
+}
+message UserBabgeResp{
+   repeated UserBabgeInfo userbabgeinfo = 1;
+}
+
+message AppleAuditWordsReq{
+}
+message AppleAuditWordsResp{
+    repeated string auditwords = 1;
+}
+
+service ConfInfoServant {
+    /*
+    获取直播间分类信息配置
+    */
+    rpc LivingCategorys(LivingCategorysReq) returns (LivingCategorysResp);
+
+     /*
+    获取直播的轮播区配置信息
+    */
+    rpc GetCarousel(CarouselReq) returns (CarouselResp);
+
+    /*
+    Banner配置信息的通用接口
+    */
+    rpc Banner(BannerReq) returns (BannerResp);
+
+    /*
+    品类运营置顶区
+    */
+    // Deprecated: Use AvailableCategoryStickie instead
+    rpc CategoryStickie(CategoryStickieReq) returns (CategoryStickieResp);
+    // 创建品类运营置顶区
+    rpc CreateCategoryStickie(CreateCategoryStickieReq) returns (CreateCategoryStickieResp);
+    // 更新品类运营置顶区
+    rpc UpdateCategoryStickie(UpdateCategoryStickieReq) returns (UpdateCategoryStickieResp);
+    // 删除品类运营置顶区
+    rpc DelCategoryStickie(DelCategoryStickieReq) returns (DelCategoryStickieResp);
+    // 返回所有可用的置顶信息
+    rpc AvailableCategoryStickie(AvailableCategoryStickieReq) returns (AvailableCategoryStickieResp);
+
+    /*
+    主播品类推荐
+    */
+    rpc CategoryHostRec(CategoryHostRecReq) returns (CategoryHostRecResp);
+    rpc CreateCategoryHostRec(CreateCategoryHostRecReq) returns (CreateCategoryHostRecResp);
+    rpc UpdateCategoryHostRec(UpdateCategoryHostRecReq) returns (UpdateCategoryHostRecResp);
+    rpc DelCategoryHostRec(DelCategoryHostRecReq) returns (DelCategoryHostRecResp);
+
+    /*
+    工会品类推荐
+    */
+    rpc CategoryGuildRec(CategoryGuildRecReq) returns (CategoryGuildRecResp);
+    rpc UpdateCategoryGuildRec(UpdateCategoryGuildRecReq) returns (UpdateCategoryGuildRecResp);
+    rpc CreateCategoryGuildRec(CreateCategoryGuildRecReq) returns (CreateCategoryGuildRecResp);
+    /*
+    根据id来软删除，id不能为0，防止删除所有
+    */
+    rpc DelCategoryGuildRec(DelCategoryGuildRecReq) returns (DelCategoryGuildRecResp);
+
+    /*
+    工会频道关系
+    */
+    // Deprecated: Use guildtars service instead
+    rpc GuildRoomS (GuildRoomSReq) returns(GuildRoomSResp);
+    rpc DelGuildRoom(DelGuildRoomReq) returns(DelGuildRoomResp);
+    rpc CreateGuildRoom(CreateGuildRoomReq) returns(CreateGuildRoomResp);
+
+    /*
+    用户图标icon
+    */
+    rpc BatchUserBabge(UserBabgeReq) returns (UserBabgeResp);
+
+    /*
+    审核过滤关键字
+    */
+    rpc AppleAuditWords(AppleAuditWordsReq) returns (AppleAuditWordsResp);
+}

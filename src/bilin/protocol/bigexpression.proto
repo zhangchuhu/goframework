@@ -1,0 +1,75 @@
+syntax = "proto3";
+
+package bilin.bigexpression;
+import "header.proto";
+
+enum EmotionType
+{
+    UnknownType = 0;
+    kEmotionTypeMood = 1;   // 心情表情
+    kEmotionTypeRandom = 2; // 事件随机表情:骰子,扑克牌
+}
+
+message Emotion
+{
+     uint32 id = 1;
+     uint32 result_index = 2;
+     repeated uint32 result_indexes = 3;
+}
+message EmotionPos
+{
+     int32 xpos = 1; //结果图片对应头像中心点的x坐标
+     int32 ypos = 2; //结果图片对应头像中心点的y坐标
+}
+message EmotionConfig
+{
+     uint32 id = 1;    //道具id,一个道具对应一个id
+     EmotionType type = 2;
+     string cnname = 3;   //中文名称
+     string enname = 4;   //英文名称
+     string resource_url = 5;  //图片地址
+     uint32 icon_image_index = 6;
+     uint32 image_count = 7;   //道具对应的图片总数
+     uint32 animation_index_start = 8;  //开始动画开始的图片
+     uint32 animation_index_end = 9;    //开始动画最后的图片
+     uint32 animation_duration = 10;    //动画时间
+     uint32 repeat_count = 11;          //重复次数
+     uint32 result_index_start = 12;    //结果动画开始的图片
+     uint32 result_index_end = 13;      //结果动画结束的图片
+     uint32 result_duration = 14;       //动画时间
+     string need_client_version = 15;
+     uint64 result_count = 16;          //最终结果的图片数量
+     repeated EmotionPos pos = 17;      //结果图片对应头像中心点的坐标
+
+}
+
+message GetEmotionConfigReq
+{
+}
+//获取表情配置文件响应
+message GetEmotionConfigRes
+{
+    uint32 config_version = 1;
+    repeated EmotionConfig emotion_config = 2;
+    string push_url = 3;
+}
+//发表情请求
+message SendEmotionReq
+{
+    Header header = 1;
+    Emotion emotion = 2;
+}
+
+//发表情响应
+message SendEmotionRes
+{
+     Emotion emotion = 1;
+}
+
+service BigExpressionObj{
+//获取表情配置文件
+rpc GetEmotionConfig(GetEmotionConfigReq) returns (GetEmotionConfigRes);
+
+//用户发表情
+rpc SendEmotion(SendEmotionReq) returns (SendEmotionRes);
+}

@@ -1,0 +1,119 @@
+syntax = "proto3";
+
+option go_package = "userinfocenter";
+package bilin.userinfocenter;
+
+message Result{
+   enum RETCODE{
+       SUCCESS = 0;
+       PARAM_ERR = 1;
+       SYSTEM_ERR = 2;
+       SYSTEM_BUSY = 3;
+   }
+   RETCODE code = 1;
+   string desc = 2;
+}
+
+message UserInfo {
+    uint64 uid = 1;
+    string avatar = 2;
+    string nick_name = 3;
+    // Deprecated: Use Showsex instead
+    uint32 sex = 4; // 1表示男，0表示女， 注册时的性别
+    string sign = 5;
+    string city = 6;
+    int64  birthday = 7; //用户没有设置生日时,返回-62135596800 即东八区 1/1/1 8:0:0
+    uint32 showsex = 8; // 1表示男，0表示女,实际显示用这个性别，不要用sex
+}
+
+message GetUserInfoReq {
+    repeated uint64 uids = 1;
+}
+
+message GetUserInfoResp {
+    Result ret = 1;
+    map<uint64,UserInfo> users = 2; // uid --> userinfo
+}
+
+message GetSingleUserInfoReq{
+    uint64 uid = 1;
+}
+message GetSingleUserInfoResp{
+    UserInfo uinfo = 1;
+}
+
+message GetAvatarUserInfoReq {
+}
+
+message GetAvatarUserInfoResp {
+    repeated UserInfo users = 1;  //个人信息只返回uid和头像
+}
+
+message IsAppleCheckUserReq{
+    uint64 uid = 1;
+    string version = 2;
+    string clienttype = 3;
+    string ip = 4;
+}
+message IsAppleCheckUserResp{
+    uint64 uid = 1;
+    bool applecheckuser = 2; // true表示为苹果审核用户
+}
+
+message BatchUserBiLinIdReq{
+    repeated uint64 uid = 1;
+}
+message BatchUserBiLinIdResp{
+    map<uint64,uint64> uid2bilinid = 1;
+}
+
+message BatchUserIdByBiLinIdReq{
+    repeated uint64 bilinid = 1;
+}
+message BatchUserIdByBiLinIdResp{
+    map<uint64,uint64> bilinid2uid = 1;
+}
+
+message AttentionInfoReq{
+    uint64 uid = 1;
+}
+message AttentionInfoResp{
+    uint64 attentionnum = 1;
+    uint64 fansnum = 2;
+    uint64 glamour = 3; //魅力值
+}
+
+service UserInfoCenterObj {
+    /*
+    批量获取用户信息
+    */
+    rpc GetUserInfo (GetUserInfoReq) returns (GetUserInfoResp);
+
+    /*
+    获取单个用户信息
+    */
+    rpc GetSingleUserInfo (GetSingleUserInfoReq) returns (GetSingleUserInfoResp);
+
+    //用于返回有头像的随机用户, 该接口不开放
+    rpc GetAvatarUserInfo (GetAvatarUserInfoReq) returns (GetAvatarUserInfoResp);
+
+    /*
+    是否苹果审核用户
+    */
+    rpc IsAppleCheckUser(IsAppleCheckUserReq) returns (IsAppleCheckUserResp);
+
+    /*
+    根据比邻uid查询比邻号
+    */
+    rpc BatchUserBiLinId(BatchUserBiLinIdReq) returns (BatchUserBiLinIdResp);
+
+    /*
+    根据比邻号查询uid
+    */
+    rpc BatchUserIdByBiLinId(BatchUserIdByBiLinIdReq) returns (BatchUserIdByBiLinIdResp);
+
+    /*
+    用户关注，粉丝，魅力值
+    */
+    rpc AttentionInfo(AttentionInfoReq) returns(AttentionInfoResp);
+}

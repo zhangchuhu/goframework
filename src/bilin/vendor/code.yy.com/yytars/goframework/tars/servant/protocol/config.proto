@@ -1,0 +1,12 @@
+syntax="proto3";
+
+package pbtaf;
+
+message ConfigPushNotice{
+    string filename = 1; //push的文件名称
+    enum RETCODE{
+       SUCCESS = 0;
+       FAILED = 1;
+    }
+    RETCODE  retcode = 2;
+}

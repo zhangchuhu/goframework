@@ -1,0 +1,88 @@
+syntax = "proto3";
+
+import "header.proto";
+
+option go_package = "bilin";
+package bilin.searchserver;
+
+enum SearchType {
+    UNKNOWN = 0; // 不要用
+    USER = 1;  // 用户
+    ROOM = 2;  // 直播间
+    SONG = 3;  // K歌的歌曲
+    USER_ROOM = -1;  // 同时搜索用户和直播间
+}
+
+message SearchReq {
+    string q = 1;  // 搜索的关键字（必填）
+    int32 rows = 2;  // 返回多少个搜索结果（<=0则返回默认10个）搜索多个类型，表示每个类型返回的结果数，而非总和。
+    int32 start = 3;  // 数据游标，表示搜索结果从第几个开始。（<=0则默认为0) 注意：分页操作只允许搜索单个类型。
+    SearchType typ = 4;  // 搜索类型（必填，取值上面enum的一种）
+    string uid = 5;  // 登录用户填uid。未登录用户，移动端填IMEI，web端填可标示身份的cookie, PC端填mac地址。
+}
+
+message SearchRsp {
+    SearchRspHeader head = 1;
+    map<string, SearchRspDataItem> data = 2;  // 这个map的key是搜索类型
+    CommonRetInfo cret = 3;
+}
+
+message SearchRspHeader {
+    int32 status = 1; // 响应的状态码，0表示正常。
+    int32 qtime = 2;  // 查询耗时，单位毫秒。
+    string err_desc = 3;  // 状态码不为0时的错误信息。
+}
+
+message SearchRspDataItem {
+    int32 num_found = 1;  // 这是搜索结果总数。当前页的数量用 docs.length 获取
+    int32 start = 2;
+    repeated string docs = 3;
+    string error = 4;
+    bool more = 5;  // 是否还有下一页数据
+}
+
+message GetRelatedHotSearchesReq {
+    string q = 1;  // 用户的输入内容，必填，不能为空
+    int32 rows = 2;   // <=0，返回默认10个
+    int32 start = 3;   // <=0，默认为0
+    SearchType typ = 4;   // 搜索类型
+    string uid = 5;  // 登录用户填uid
+}
+
+message GetRelatedHotSearchesRsp {
+    repeated string hot_searches = 1;
+    CommonRetInfo cret = 2;
+}
+
+message GetAllHotSearchesReq {
+    // 只搜索用户和直播间，所以不需要参数。
+}
+
+message GetAllHotSearchesRsp {
+    repeated string hot_searches = 1;
+    CommonRetInfo cret = 2;
+}
+
+message GetHotSongsReq {
+    int32 rows = 2;   // <=0，返回默认10个
+    int32 start = 3;   // <=0，默认为0
+    string uid = 5;  // 登录用户填uid
+}
+
+message GetHotSongsRsp {
+    // 热门歌曲需要分页，所以采用与SearchRsp相同的返回模型
+    SearchRspHeader head = 1;
+    map<string, SearchRspDataItem> data = 2;  // 这个map的key是搜索类型
+    CommonRetInfo cret = 3;
+}
+
+service SearchServant {
+    // 发起搜索请求
+    rpc Search(SearchReq) returns (SearchRsp);
+    // 用户有输入时，获取跟输入内容相关的热搜词
+    rpc GetRelatedHotSearches(GetRelatedHotSearchesReq) returns (GetRelatedHotSearchesRsp);
+    // 获取所有的用户和直播间相关的热搜词（用户没有输入时）
+    rpc GetAllHotSearches(GetAllHotSearchesReq) returns (GetAllHotSearchesRsp);
+    // 获取热门歌曲
+    rpc GetHotSongs(GetHotSongsReq) returns (GetHotSongsRsp);
+}
